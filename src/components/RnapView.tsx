@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Download, Trash2, Pencil, AlertTriangle, Upload, X, Send } from "lucide-react";
+import { Plus, Download, Trash2, Pencil, Upload, X, Send, FileText } from "lucide-react";
 import { toPng, toBlob } from "html-to-image";
 import { sendRnapToDiscord } from "@/lib/discord";
 import rnapTplUrl from "@/assets/rnap-nuevo.png";
