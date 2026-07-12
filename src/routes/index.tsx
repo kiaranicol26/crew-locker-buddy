@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Shield } from "lucide-react";
 import { useState } from "react";
+import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
