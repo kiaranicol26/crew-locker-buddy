@@ -94,7 +94,7 @@ export function LoginView() {
               <div className="flex justify-center mb-6">
                 <div className="bg-white p-4 border border-blue-200">
                   <img
-                    src="https://i.ibb.co/kssC1q9Q/Adobe-Express-file.png"
+                    src={sapdLogo.url}
                     alt="SAPD"
                     className="w-36 h-36 object-contain"
                   />
