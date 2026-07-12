@@ -127,8 +127,8 @@ export function AltoMando({ session }: { session: Session }) {
         <div className="h-1 bg-blue-600" />
         <div className="p-5 space-y-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white border border-blue-700">
-              <Shield className="w-6 h-6" />
+            <div className="w-12 h-12 flex items-center justify-center bg-white border border-blue-200 p-1">
+              <img src={sapdLogo.url} alt="SAPD" className="w-full h-full object-contain" />
             </div>
             <div>
               <p className="text-blue-600 text-xs uppercase tracking-[0.3em] font-bold">
