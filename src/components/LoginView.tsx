@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Shield } from "lucide-react";
+import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 
 export function LoginView() {
   const [id, setId] = useState("");
@@ -67,8 +67,8 @@ export function LoginView() {
 
             <div className="bg-white border-b border-blue-200 px-6 py-5 flex items-center justify-between gap-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white border border-blue-700">
-                  <Shield className="w-7 h-7" />
+                <div className="w-12 h-12 flex items-center justify-center bg-white border border-blue-200 p-1">
+                  <img src={sapdLogo.url} alt="SAPD" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <h1 className="text-blue-700 font-display font-extrabold text-3xl tracking-wider">
@@ -94,7 +94,7 @@ export function LoginView() {
               <div className="flex justify-center mb-6">
                 <div className="bg-white p-4 border border-blue-200">
                   <img
-                    src="https://i.ibb.co/kssC1q9Q/Adobe-Express-file.png"
+                    src={sapdLogo.url}
                     alt="SAPD"
                     className="w-36 h-36 object-contain"
                   />

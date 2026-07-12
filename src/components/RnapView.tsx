@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, logAction } from "@/lib/session";
 import { Button } from "@/components/ui/button";
@@ -100,8 +101,8 @@ export function RnapView({ session }: { session: Session }) {
     <div className="space-y-4">
       <div className="w-full bg-white border border-blue-200 shadow-sm p-5">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white border border-blue-700">
-            <FileText className="w-6 h-6" />
+          <div className="w-12 h-12 flex items-center justify-center bg-white border border-blue-200 p-1">
+            <img src={sapdLogo.url} alt="SAPD" className="w-full h-full object-contain" />
           </div>
           <div className="flex-1">
             <p className="text-blue-600 text-xs uppercase tracking-[0.3em] font-bold">
