@@ -121,38 +121,43 @@ export function AltoMando({ session }: { session: Session }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* CREAR ID */}
-      <Card className="overflow-hidden border border-slate-700/60 bg-slate-900/85 backdrop-blur shadow-[0_0_45px_rgba(0,0,0,.55)]">
-        <div className="h-1 bg-gradient-to-r from-yellow-500 via-yellow-300 to-yellow-500" />
-        <div className="p-6 space-y-5">
-          <div>
-            <p className="text-blue-300 text-xs uppercase tracking-[0.35em] font-semibold">
-              San Andreas Police Department
-            </p>
-            <h2 className="mt-2 text-2xl font-extrabold uppercase tracking-wide text-white font-display">
-              Crear Nuevo ID
-            </h2>
+      <Card className="overflow-hidden border border-blue-200 bg-white shadow-sm rounded-none">
+        <div className="h-1 bg-blue-600" />
+        <div className="p-5 space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white border border-blue-700">
+              <Shield className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-blue-600 text-xs uppercase tracking-[0.3em] font-bold">
+                San Andreas Police Department
+              </p>
+              <h2 className="text-2xl font-black uppercase tracking-wide text-slate-900 font-display">
+                Crear Nuevo ID
+              </h2>
+            </div>
           </div>
           <form onSubmit={createInstructor} className="grid gap-3 md:grid-cols-4">
-            <Input placeholder="ID (Ej: R-105WZRP)" value={newId}
+            <Input placeholder="ID (Ej: K-105WZRP)" value={newId}
               onChange={e => setNewId(e.target.value)}
-              className="h-11 bg-slate-800 border-slate-700 text-white font-mono uppercase focus:border-blue-500" />
+              className="h-11 rounded-none border-blue-300 bg-white text-slate-800 font-mono uppercase focus:border-blue-600" />
             <Input placeholder="Nombre" value={newName}
               onChange={e => setNewName(e.target.value)}
-              className="h-11 bg-slate-800 border-slate-700 text-white focus:border-blue-500" />
+              className="h-11 rounded-none border-blue-300 bg-white text-slate-800 focus:border-blue-600" />
             <Select value={newRole} onValueChange={setNewRole}>
-              <SelectTrigger className="h-11 bg-slate-800 border-slate-700 text-white">
+              <SelectTrigger className="h-11 rounded-none border-blue-300 bg-white text-slate-800">
                 <SelectValue placeholder="Rol" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700 text-white">
+              <SelectContent className="bg-white border border-blue-200 text-slate-800 rounded-none">
                 <SelectItem value="Comisario">Comisario (Alto Mando)</SelectItem>
                 <SelectItem value="Cupula">Cúpula</SelectItem>
                 <SelectItem value="Instructor">Instructor</SelectItem>
               </SelectContent>
             </Select>
             <Button type="submit"
-              className="h-11 bg-blue-700 hover:bg-blue-600 text-white font-semibold tracking-wider shadow-lg shadow-blue-900/40">
+              className="h-11 rounded-none bg-blue-600 hover:bg-blue-700 text-white font-semibold tracking-wider">
               Crear ID
             </Button>
           </form>
@@ -161,48 +166,48 @@ export function AltoMando({ session }: { session: Session }) {
 
       {/* WEBHOOKS */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="overflow-hidden border border-slate-700/60 bg-slate-900/85 backdrop-blur shadow-[0_0_45px_rgba(0,0,0,.55)]">
-          <div className="h-1 bg-gradient-to-r from-yellow-500 via-yellow-300 to-yellow-500" />
-          <div className="p-6 space-y-4">
+        <Card className="overflow-hidden border border-blue-200 bg-white shadow-sm rounded-none">
+          <div className="h-1 bg-blue-600" />
+          <div className="p-5 space-y-4">
             <div className="flex items-center gap-3">
-              <Webhook className="w-5 h-5 text-yellow-400" />
-              <h2 className="text-xl font-extrabold uppercase tracking-wide text-white font-display">
+              <Webhook className="w-5 h-5 text-blue-600" />
+              <h2 className="text-xl font-black uppercase tracking-wide text-slate-900 font-display">
                 Webhook de Cambios
               </h2>
             </div>
-            <p className="text-slate-400 text-sm">
+            <p className="text-slate-500 text-sm">
               Notificaciones de cambios en Ex Policías y Aspirantes.
             </p>
             <div className="flex gap-2">
               <Input value={webhook} onChange={e => setWebhook(e.target.value)}
                 placeholder="https://discord.com/api/webhooks/..."
-                className="h-11 bg-slate-800 border-slate-700 text-white font-mono text-sm" />
+                className="h-11 rounded-none border-blue-300 bg-white text-slate-800 font-mono text-sm" />
               <Button onClick={saveWebhook} disabled={savingHook}
-                className="h-11 bg-blue-800 hover:bg-blue-700 text-white font-semibold">
+                className="h-11 rounded-none bg-blue-600 hover:bg-blue-700 text-white font-semibold">
                 {savingHook ? "..." : "Guardar"}
               </Button>
             </div>
           </div>
         </Card>
 
-        <Card className="overflow-hidden border border-slate-700/60 bg-slate-900/85 backdrop-blur shadow-[0_0_45px_rgba(0,0,0,.55)]">
-          <div className="h-1 bg-gradient-to-r from-yellow-500 via-yellow-300 to-yellow-500" />
-          <div className="p-6 space-y-4">
+        <Card className="overflow-hidden border border-blue-200 bg-white shadow-sm rounded-none">
+          <div className="h-1 bg-blue-600" />
+          <div className="p-5 space-y-4">
             <div className="flex items-center gap-3">
-              <FileText className="w-5 h-5 text-yellow-400" />
-              <h2 className="text-xl font-extrabold uppercase tracking-wide text-white font-display">
+              <FileText className="w-5 h-5 text-blue-600" />
+              <h2 className="text-xl font-black uppercase tracking-wide text-slate-900 font-display">
                 Enviar RNAP
               </h2>
             </div>
-            <p className="text-slate-400 text-sm">
+            <p className="text-slate-500 text-sm">
               Canal al que se enviará la imagen del RNAP al presionar “Enviar a Discord”.
             </p>
             <div className="flex gap-2">
               <Input value={rnapHook} onChange={e => setRnapHook(e.target.value)}
                 placeholder="https://discord.com/api/webhooks/..."
-                className="h-11 bg-slate-800 border-slate-700 text-white font-mono text-sm" />
+                className="h-11 rounded-none border-blue-300 bg-white text-slate-800 font-mono text-sm" />
               <Button onClick={saveRnapWebhook} disabled={savingRnap}
-                className="h-11 bg-blue-800 hover:bg-blue-700 text-white font-semibold">
+                className="h-11 rounded-none bg-blue-600 hover:bg-blue-700 text-white font-semibold">
                 {savingRnap ? "..." : "Guardar"}
               </Button>
             </div>
@@ -211,63 +216,70 @@ export function AltoMando({ session }: { session: Session }) {
       </div>
 
       {/* INSTRUCTORES + PERMISOS */}
-      <Card className="overflow-hidden border border-slate-700/60 bg-slate-900/85 backdrop-blur shadow-[0_0_45px_rgba(0,0,0,.55)]">
-        <div className="h-1 bg-gradient-to-r from-yellow-500 via-yellow-300 to-yellow-500" />
-        <div className="p-6 space-y-5">
-          <h2 className="text-2xl font-extrabold uppercase tracking-wide text-white font-display">
+      <Card className="overflow-hidden border border-blue-200 bg-white shadow-sm rounded-none">
+        <div className="h-1 bg-blue-600" />
+        <div className="p-5 space-y-4">
+          <h2 className="text-2xl font-black uppercase tracking-wide text-slate-900 font-display">
             Personal Autorizado
           </h2>
-          <div className="border border-slate-700/50 rounded-md overflow-auto">
+          <div className="border border-blue-200">
             <table className="w-full text-sm font-table">
               <thead>
-                <tr className="bg-gradient-to-r from-slate-800 via-slate-700/80 to-slate-800">
-                  <th className="p-3 text-left text-blue-200 border border-slate-700/50">ID</th>
-                  <th className="p-3 text-left text-blue-200 border border-slate-700/50">Nombre</th>
-                  <th className="p-3 text-left text-blue-200 border border-slate-700/50">Rol</th>
-                  <th className="p-3 text-center text-blue-200 border border-slate-700/50">Borrar agentes</th>
-                  <th className="p-3 text-center text-blue-200 border border-slate-700/50">Emitir RNAP</th>
-                  <th className="p-3 text-left text-blue-200 border border-slate-700/50">Creado por</th>
-                  <th className="p-3 border border-slate-700/50 w-10" />
+                <tr className="bg-blue-600 text-white">
+                  <th className="p-3 text-left border border-blue-500 uppercase font-bold">ID</th>
+                  <th className="p-3 text-left border border-blue-500 uppercase font-bold">Nombre</th>
+                  <th className="p-3 text-left border border-blue-500 uppercase font-bold">Rol</th>
+                  <th className="p-3 text-center border border-blue-500 uppercase font-bold">Borrar agentes</th>
+                  <th className="p-3 text-center border border-blue-500 uppercase font-bold">Emitir RNAP</th>
+                  <th className="p-3 text-left border border-blue-500 uppercase font-bold">Creado por</th>
+                  <th className="p-3 border border-blue-500 w-10" />
                 </tr>
               </thead>
               <tbody>
                 {instructors.map(i => (
-                  <tr key={i.id} className="border-t border-slate-700/40 hover:bg-slate-800/40 transition-colors">
-                    <td className="p-3 font-mono text-blue-200">{i.id}</td>
-                    <td className="p-3 text-white">{i.name}</td>
-                    <td className="p-3">
+                  <tr key={i.id} className="border-t border-slate-200 hover:bg-blue-50 transition-colors">
+                    <td className="p-3 font-mono text-slate-700 border border-slate-200">{i.id}</td>
+                    <td className="p-3 text-slate-700 border border-slate-200">{i.name}</td>
+                    <td className="p-3 border border-slate-200">
                       {i.role === "Comisario" ? (
-                        <span className="inline-flex items-center gap-2 text-yellow-400 font-semibold">
+                        <span className="inline-flex items-center gap-2 text-blue-700 font-semibold">
                           <Shield className="w-4 h-4" /> Comisario
                         </span>
                       ) : (
-                        <span className="text-slate-300">{i.role}</span>
+                        <span className="text-slate-600">{i.role}</span>
                       )}
                     </td>
-                    <td className="p-3 text-center">
+                    <td className="p-3 text-center border border-slate-200">
                       <Switch
                         checked={i.is_alto_mando || !!i.can_delete}
                         disabled={i.is_alto_mando}
                         onCheckedChange={v => togglePerm(i, "can_delete", v)}
                       />
                     </td>
-                    <td className="p-3 text-center">
+                    <td className="p-3 text-center border border-slate-200">
                       <Switch
                         checked={i.is_alto_mando || !!i.can_emit_rnap}
                         disabled={i.is_alto_mando}
                         onCheckedChange={v => togglePerm(i, "can_emit_rnap", v)}
                       />
                     </td>
-                    <td className="p-3 text-slate-400">{i.created_by ?? "—"}</td>
-                    <td className="p-3 text-center">
+                    <td className="p-3 text-slate-500 border border-slate-200">{i.created_by ?? "—"}</td>
+                    <td className="p-3 text-center border border-slate-200">
                       <Button size="icon" variant="ghost"
                         onClick={() => removeInstructor(i.id, i.name)}
-                        className="h-8 w-8 hover:bg-red-900/30">
-                        <Trash2 className="w-4 h-4 text-red-400" />
+                        className="h-8 w-8 rounded-none hover:bg-red-100">
+                        <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>
                     </td>
                   </tr>
                 ))}
+                {instructors.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="p-10 text-center text-slate-400 uppercase tracking-widest">
+                      Sin personal autorizado.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -275,39 +287,39 @@ export function AltoMando({ session }: { session: Session }) {
       </Card>
 
       {/* LOGS */}
-      <Card className="border border-slate-700/60 bg-slate-900/85 backdrop-blur shadow-[0_0_45px_rgba(0,0,0,.55)]">
-        <div className="p-6 space-y-5">
-          <h2 className="text-2xl font-extrabold uppercase tracking-wide text-white font-display">
+      <Card className="border border-blue-200 bg-white shadow-sm rounded-none">
+        <div className="p-5 space-y-4">
+          <h2 className="text-2xl font-black uppercase tracking-wide text-slate-900 font-display">
             Registro de Movimientos
           </h2>
-          <div className="border border-slate-700/50 rounded-md overflow-auto max-h-[500px]">
+          <div className="border border-blue-200 max-h-[500px] overflow-auto">
             <table className="w-full text-sm font-table">
               <thead className="sticky top-0">
-                <tr className="bg-gradient-to-r from-slate-800 via-slate-700/80 to-slate-800">
-                  <th className="p-3 text-left text-blue-200 border border-slate-700/50">Fecha</th>
-                  <th className="p-3 text-left text-blue-200 border border-slate-700/50">ID</th>
-                  <th className="p-3 text-left text-blue-200 border border-slate-700/50">Nombre</th>
-                  <th className="p-3 text-left text-blue-200 border border-slate-700/50">Acción</th>
-                  <th className="p-3 text-left text-blue-200 border border-slate-700/50">Detalles</th>
+                <tr className="bg-blue-600 text-white">
+                  <th className="p-3 text-left border border-blue-500 uppercase font-bold">Fecha</th>
+                  <th className="p-3 text-left border border-blue-500 uppercase font-bold">ID</th>
+                  <th className="p-3 text-left border border-blue-500 uppercase font-bold">Nombre</th>
+                  <th className="p-3 text-left border border-blue-500 uppercase font-bold">Acción</th>
+                  <th className="p-3 text-left border border-blue-500 uppercase font-bold">Detalles</th>
                 </tr>
               </thead>
               <tbody>
                 {logs.map(l => (
-                  <tr key={l.id} className="border-t border-slate-700/40 hover:bg-slate-800/40 transition-colors">
-                    <td className="p-3 text-xs text-slate-400 whitespace-nowrap">
+                  <tr key={l.id} className="border-t border-slate-200 hover:bg-blue-50 transition-colors">
+                    <td className="p-3 text-xs text-slate-500 whitespace-nowrap border border-slate-200">
                       {new Date(l.created_at).toLocaleString()}
                     </td>
-                    <td className="p-3 font-mono text-blue-200">{l.instructor_id ?? "—"}</td>
-                    <td className="p-3 text-white">{l.instructor_name ?? "—"}</td>
-                    <td className="p-3 font-semibold text-yellow-400">{l.action}</td>
-                    <td className="p-3 text-xs text-slate-400 max-w-[300px]">
+                    <td className="p-3 font-mono text-slate-700 border border-slate-200">{l.instructor_id ?? "—"}</td>
+                    <td className="p-3 text-slate-700 border border-slate-200">{l.instructor_name ?? "—"}</td>
+                    <td className="p-3 font-semibold text-blue-700 border border-slate-200">{l.action}</td>
+                    <td className="p-3 text-xs text-slate-500 max-w-[300px] border border-slate-200">
                       {l.details ? JSON.stringify(l.details) : "—"}
                     </td>
                   </tr>
                 ))}
                 {logs.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="p-8 text-center text-slate-400">
+                    <td colSpan={5} className="p-10 text-center text-slate-400 uppercase tracking-widest">
                       Sin movimientos aún.
                     </td>
                   </tr>
