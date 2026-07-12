@@ -242,7 +242,7 @@ export function RecordsTable({
 
 
       section:
-        "Registros de la Policía",
+        "Ex Policía",
 
 
       targetName:
@@ -381,11 +381,11 @@ export function RecordsTable({
 
 
       action:
-        "Eliminado",
+        "Borrado",
 
 
       section:
-        "Registros de la Policía",
+        "Ex Policía",
 
 
 
@@ -648,7 +648,7 @@ export function RecordsTable({
 
 
       section:
-        "Registros de la Policía",
+        "Ex Policía",
 
 
 
