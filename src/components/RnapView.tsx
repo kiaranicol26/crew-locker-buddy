@@ -377,10 +377,10 @@ function RnapCard({ data, downloadable = false, editorName }: { data: Cert; down
 
       {downloadable && (
         <div className="flex justify-end gap-2">
-          <Button onClick={download} className="bg-blue-700 hover:bg-blue-600">
+          <Button onClick={download} className="rounded-none bg-blue-600 hover:bg-blue-700 text-white">
             <Download className="w-4 h-4 mr-1" /> Descargar Imagen
           </Button>
-          <Button onClick={sendDiscord} disabled={sending} className="bg-yellow-600 hover:bg-yellow-500 text-slate-900 font-semibold">
+          <Button onClick={sendDiscord} disabled={sending} className="rounded-none bg-blue-700 hover:bg-blue-800 text-white font-semibold">
             <Send className="w-4 h-4 mr-1" /> {sending ? "Enviando..." : "Enviar a Discord"}
           </Button>
         </div>
