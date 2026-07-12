@@ -94,33 +94,33 @@ export function EditRecordDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl bg-slate-900 border border-blue-900/60 text-white max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl bg-white border border-blue-200 text-slate-900 rounded-none max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl uppercase tracking-wide text-yellow-400">
+          <DialogTitle className="font-display text-2xl uppercase tracking-wide text-blue-700">
             Editar Ex Policía
           </DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-2">
           <div className="flex items-center gap-3">
-            <Label className="w-32 text-blue-200">Pasa</Label>
+            <Label className="w-32 text-slate-600">Pasa</Label>
             <PasaSelector value={form.pasa} onChange={v => setForm({ ...form, pasa: v })} />
           </div>
 
           {FIELDS.map(f => (
             <div key={String(f.key)} className="grid gap-1">
-              <Label className="text-blue-200 text-xs uppercase tracking-wider">{f.label}</Label>
+              <Label className="text-slate-600 text-xs uppercase tracking-wider">{f.label}</Label>
               {f.textarea ? (
                 <Textarea
                   value={(form[f.key] as string) ?? ""}
                   onChange={e => setForm({ ...form, [f.key]: e.target.value })}
-                  className="bg-slate-800 border-slate-700 text-white min-h-[70px]"
+                  className="rounded-none border-blue-300 bg-white text-slate-800 min-h-[70px]"
                 />
               ) : (
                 <Input
                   value={(form[f.key] as string) ?? ""}
                   onChange={e => setForm({ ...form, [f.key]: e.target.value })}
-                  className="bg-slate-800 border-slate-700 text-white"
+                  className="rounded-none border-blue-300 bg-white text-slate-800"
                 />
               )}
             </div>
@@ -128,8 +128,8 @@ export function EditRecordDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="border-slate-700">Cancelar</Button>
-          <Button onClick={save} className="bg-blue-700 hover:bg-blue-600">Guardar Cambios</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-none border-blue-300">Cancelar</Button>
+          <Button onClick={save} className="rounded-none bg-blue-600 hover:bg-blue-700 text-white">Guardar Cambios</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

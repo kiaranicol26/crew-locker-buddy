@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Download, Trash2, Pencil, AlertTriangle, Upload, X, Send } from "lucide-react";
+import { Plus, Download, Trash2, Pencil, Upload, X, Send, FileText } from "lucide-react";
 import { toPng, toBlob } from "html-to-image";
 import { sendRnapToDiscord } from "@/lib/discord";
 import rnapTplUrl from "@/assets/rnap-nuevo.png";
@@ -97,54 +97,58 @@ export function RnapView({ session }: { session: Session }) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-md border border-yellow-500/50 bg-yellow-500/10 text-yellow-200 px-4 py-3 flex items-center gap-3 font-display">
-        <AlertTriangle className="w-5 h-5 shrink-0" />
-        <span className="text-sm uppercase tracking-wider">
-          Modo de Testeo — esta sección puede contener errores.
-        </span>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-2xl uppercase tracking-widest text-yellow-300">
-          R.N.A.P — Registro Nacional de Antecedentes Penales
-        </h2>
-        {canEmit && (
-          <Button onClick={openCreate} className="bg-blue-700 hover:bg-blue-600">
-            <Plus className="w-4 h-4 mr-1" /> Crear RNAP
-          </Button>
-        )}
+    <div className="space-y-4">
+      <div className="w-full bg-white border border-blue-200 shadow-sm p-5">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white border border-blue-700">
+            <FileText className="w-6 h-6" />
+          </div>
+          <div className="flex-1">
+            <p className="text-blue-600 text-xs uppercase tracking-[0.3em] font-bold">
+              San Andreas Police Department
+            </p>
+            <h2 className="text-2xl font-black text-slate-900 uppercase font-display">
+              R.N.A.P — Registro Nacional de Antecedentes Penales
+            </h2>
+            <p className="text-slate-500 text-sm">Modo de Testeo — esta sección puede contener errores.</p>
+          </div>
+          {canEmit && (
+            <Button onClick={openCreate} className="rounded-none bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+              <Plus className="w-4 h-4 mr-1" /> Crear RNAP
+            </Button>
+          )}
+        </div>
       </div>
 
       {loading ? (
-        <p className="text-slate-400">Cargando…</p>
+        <p className="text-slate-500">Cargando…</p>
       ) : certs.length === 0 ? (
-        <p className="text-slate-400 italic">No hay certificados guardados aún.</p>
+        <p className="text-slate-500 italic">No hay certificados guardados aún.</p>
       ) : (
         <div className="grid gap-3">
           {certs.map(c => (
             <div key={c.id}
-              className="flex items-center justify-between rounded-md border border-blue-900/60 bg-slate-950/60 backdrop-blur px-4 py-3">
+              className="flex items-center justify-between border border-blue-200 bg-white px-4 py-3">
               <button onClick={() => setPreview(c)} className="text-left flex-1">
-                <div className="font-display uppercase tracking-wide text-white text-lg">{c.nombre_completo}</div>
-                <div className="text-xs text-slate-400 font-mono">
+                <div className="font-display uppercase tracking-wide text-slate-900 text-lg">{c.nombre_completo}</div>
+                <div className="text-xs text-slate-500 font-mono">
                   {c.tipo_documento}: {c.numero_documento || "—"} · {c.nacionalidad || "—"}
                 </div>
               </button>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => setPreview(c)}
-                  className="border-slate-700 bg-slate-900 text-white hover:bg-slate-800">
+                  className="rounded-none border-blue-300 bg-white text-slate-700 hover:bg-blue-50">
                   Ver
                 </Button>
                 {canEmit && (
                   <Button size="sm" variant="outline" onClick={() => openEdit(c)}
-                    className="border-slate-700 bg-slate-900 text-white hover:bg-slate-800">
+                    className="rounded-none border-blue-300 bg-white text-slate-700 hover:bg-blue-50">
                     <Pencil className="w-4 h-4" />
                   </Button>
                 )}
                 {canDelete && (
                   <Button size="sm" variant="outline" onClick={() => remove(c)}
-                    className="border-red-900/60 bg-red-950/40 text-red-200 hover:bg-red-900/50">
+                    className="rounded-none border-red-300 bg-red-50 text-red-700 hover:bg-red-100">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 )}
@@ -157,9 +161,9 @@ export function RnapView({ session }: { session: Session }) {
       {/* Editor dialog */}
       {editor && (
         <Dialog open={editor.open} onOpenChange={(v) => !v && setEditor(null)}>
-          <DialogContent className="max-w-6xl bg-slate-900 border border-blue-900/60 text-white max-h-[95vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl bg-white border border-blue-200 text-slate-900 rounded-none max-h-[95vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="font-display text-2xl uppercase tracking-wide text-yellow-300">
+              <DialogTitle className="font-display text-2xl uppercase tracking-wide text-blue-700">
                 {("id" in editor.data && editor.data.id) ? "Editar RNAP" : "Crear RNAP"}
               </DialogTitle>
             </DialogHeader>
@@ -169,43 +173,43 @@ export function RnapView({ session }: { session: Session }) {
                 <Field label="Nombre Completo">
                   <Input value={editor.data.nombre_completo}
                     onChange={e => setEditor({ ...editor, data: { ...editor.data, nombre_completo: e.target.value } })}
-                    className="bg-slate-800 border-slate-700 text-white" placeholder="Nombre Apellido" />
+                    className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="Nombre Apellido" />
                 </Field>
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="Tipo Doc.">
                     <Input value={editor.data.tipo_documento ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, tipo_documento: e.target.value } })}
-                      className="bg-slate-800 border-slate-700 text-white" placeholder="DNI" />
+                      className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="DNI" />
                   </Field>
                   <Field label="Nº de Documento">
                     <Input value={editor.data.numero_documento ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, numero_documento: e.target.value } })}
-                      className="bg-slate-800 border-slate-700 text-white" placeholder="000 000 000" />
+                      className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="000 000 000" />
                   </Field>
                 </div>
                 <Field label="Fecha de Nacimiento">
                   <Input value={editor.data.fecha_nacimiento ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, fecha_nacimiento: e.target.value } })}
-                    className="bg-slate-800 border-slate-700 text-white" placeholder="Día - Mes - Año" />
+                    className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="Día - Mes - Año" />
                 </Field>
                 <Field label="Nacionalidad">
                   <Input value={editor.data.nacionalidad ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, nacionalidad: e.target.value } })}
-                    className="bg-slate-800 border-slate-700 text-white" placeholder="Nacionalidad" />
+                    className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="Nacionalidad" />
                 </Field>
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="Emitido el">
                     <Input value={editor.data.emitido_fecha ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, emitido_fecha: e.target.value } })}
-                      className="bg-slate-800 border-slate-700 text-white" placeholder="06 de Julio 2026" />
+                      className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="06 de Julio 2026" />
                   </Field>
                   <Field label="Emitido por">
                     <Input value={editor.data.emitido_por ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, emitido_por: e.target.value } })}
-                      className="bg-slate-800 border-slate-700 text-white" placeholder="Nombre del emisor" />
+                      className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="Nombre del emisor" />
                   </Field>
                 </div>
                 <Field label="Antecedentes (Nº / Texto)">
                   <Input value={editor.data.antecedentes ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, antecedentes: e.target.value } })}
-                    className="bg-slate-800 border-slate-700 text-white" placeholder="N° 000-000-000" />
+                    className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="N° 000-000-000" />
                 </Field>
                 <Field label="Fotografía">
                   <div className="flex items-center gap-3">
-                    <label className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-slate-700 bg-slate-800 hover:bg-slate-700 cursor-pointer text-sm">
+                    <label className="inline-flex items-center gap-2 px-3 py-2 border border-blue-300 bg-white hover:bg-blue-50 cursor-pointer text-sm text-slate-700">
                       <Upload className="w-4 h-4" /> Subir imagen
                       <input type="file" accept="image/*" className="hidden"
                         onChange={async (e) => {
@@ -219,9 +223,9 @@ export function RnapView({ session }: { session: Session }) {
                     </label>
                     {editor.data.foto && (
                       <div className="flex items-center gap-2">
-                        <img src={editor.data.foto} alt="preview" className="w-12 h-12 object-cover rounded border border-slate-700" />
+                        <img src={editor.data.foto} alt="preview" className="w-12 h-12 object-cover border border-blue-300" />
                         <button type="button" onClick={() => setEditor({ ...editor, data: { ...editor.data, foto: "" } })}
-                          className="text-red-300 hover:text-red-200"><X className="w-4 h-4" /></button>
+                          className="text-red-600 hover:text-red-700"><X className="w-4 h-4" /></button>
                       </div>
                     )}
                   </div>
@@ -229,14 +233,14 @@ export function RnapView({ session }: { session: Session }) {
               </div>
 
               <div>
-                <div className="text-xs text-blue-200 uppercase tracking-wider mb-2">Vista Previa</div>
+                <div className="text-xs text-blue-600 uppercase tracking-wider mb-2">Vista Previa</div>
                 <RnapCard data={editor.data as Cert} />
               </div>
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setEditor(null)} className="border-slate-700">Cancelar</Button>
-              <Button onClick={save} className="bg-blue-700 hover:bg-blue-600">Guardar RNAP</Button>
+              <Button variant="outline" onClick={() => setEditor(null)} className="rounded-none border-blue-300">Cancelar</Button>
+              <Button onClick={save} className="rounded-none bg-blue-600 hover:bg-blue-700 text-white">Guardar RNAP</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -245,9 +249,9 @@ export function RnapView({ session }: { session: Session }) {
       {/* Preview dialog */}
       {preview && (
         <Dialog open={!!preview} onOpenChange={(v) => !v && setPreview(null)}>
-          <DialogContent className="max-w-5xl bg-slate-900 border border-blue-900/60 text-white">
+          <DialogContent className="max-w-5xl bg-white border border-blue-200 text-slate-900 rounded-none">
             <DialogHeader>
-              <DialogTitle className="font-display text-2xl uppercase tracking-wide text-yellow-300">
+              <DialogTitle className="font-display text-2xl uppercase tracking-wide text-blue-700">
                 {preview.nombre_completo}
               </DialogTitle>
             </DialogHeader>
@@ -262,7 +266,7 @@ export function RnapView({ session }: { session: Session }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid gap-1">
-      <Label className="text-blue-200 text-xs uppercase tracking-wider">{label}</Label>
+      <Label className="text-blue-600 text-xs uppercase tracking-wider">{label}</Label>
       {children}
     </div>
   );
@@ -373,10 +377,10 @@ function RnapCard({ data, downloadable = false, editorName }: { data: Cert; down
 
       {downloadable && (
         <div className="flex justify-end gap-2">
-          <Button onClick={download} className="bg-blue-700 hover:bg-blue-600">
+          <Button onClick={download} className="rounded-none bg-blue-600 hover:bg-blue-700 text-white">
             <Download className="w-4 h-4 mr-1" /> Descargar Imagen
           </Button>
-          <Button onClick={sendDiscord} disabled={sending} className="bg-yellow-600 hover:bg-yellow-500 text-slate-900 font-semibold">
+          <Button onClick={sendDiscord} disabled={sending} className="rounded-none bg-blue-700 hover:bg-blue-800 text-white font-semibold">
             <Send className="w-4 h-4 mr-1" /> {sending ? "Enviando..." : "Enviar a Discord"}
           </Button>
         </div>
