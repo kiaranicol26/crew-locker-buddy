@@ -161,9 +161,9 @@ export function RnapView({ session }: { session: Session }) {
       {/* Editor dialog */}
       {editor && (
         <Dialog open={editor.open} onOpenChange={(v) => !v && setEditor(null)}>
-          <DialogContent className="max-w-6xl bg-slate-900 border border-blue-900/60 text-white max-h-[95vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl bg-white border border-blue-200 text-slate-900 rounded-none max-h-[95vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="font-display text-2xl uppercase tracking-wide text-yellow-300">
+              <DialogTitle className="font-display text-2xl uppercase tracking-wide text-blue-700">
                 {("id" in editor.data && editor.data.id) ? "Editar RNAP" : "Crear RNAP"}
               </DialogTitle>
             </DialogHeader>
@@ -173,43 +173,43 @@ export function RnapView({ session }: { session: Session }) {
                 <Field label="Nombre Completo">
                   <Input value={editor.data.nombre_completo}
                     onChange={e => setEditor({ ...editor, data: { ...editor.data, nombre_completo: e.target.value } })}
-                    className="bg-slate-800 border-slate-700 text-white" placeholder="Nombre Apellido" />
+                    className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="Nombre Apellido" />
                 </Field>
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="Tipo Doc.">
                     <Input value={editor.data.tipo_documento ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, tipo_documento: e.target.value } })}
-                      className="bg-slate-800 border-slate-700 text-white" placeholder="DNI" />
+                      className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="DNI" />
                   </Field>
                   <Field label="Nº de Documento">
                     <Input value={editor.data.numero_documento ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, numero_documento: e.target.value } })}
-                      className="bg-slate-800 border-slate-700 text-white" placeholder="000 000 000" />
+                      className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="000 000 000" />
                   </Field>
                 </div>
                 <Field label="Fecha de Nacimiento">
                   <Input value={editor.data.fecha_nacimiento ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, fecha_nacimiento: e.target.value } })}
-                    className="bg-slate-800 border-slate-700 text-white" placeholder="Día - Mes - Año" />
+                    className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="Día - Mes - Año" />
                 </Field>
                 <Field label="Nacionalidad">
                   <Input value={editor.data.nacionalidad ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, nacionalidad: e.target.value } })}
-                    className="bg-slate-800 border-slate-700 text-white" placeholder="Nacionalidad" />
+                    className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="Nacionalidad" />
                 </Field>
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="Emitido el">
                     <Input value={editor.data.emitido_fecha ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, emitido_fecha: e.target.value } })}
-                      className="bg-slate-800 border-slate-700 text-white" placeholder="06 de Julio 2026" />
+                      className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="06 de Julio 2026" />
                   </Field>
                   <Field label="Emitido por">
                     <Input value={editor.data.emitido_por ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, emitido_por: e.target.value } })}
-                      className="bg-slate-800 border-slate-700 text-white" placeholder="Nombre del emisor" />
+                      className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="Nombre del emisor" />
                   </Field>
                 </div>
                 <Field label="Antecedentes (Nº / Texto)">
                   <Input value={editor.data.antecedentes ?? ""} onChange={e => setEditor({ ...editor, data: { ...editor.data, antecedentes: e.target.value } })}
-                    className="bg-slate-800 border-slate-700 text-white" placeholder="N° 000-000-000" />
+                    className="rounded-none border-blue-300 bg-white text-slate-800" placeholder="N° 000-000-000" />
                 </Field>
                 <Field label="Fotografía">
                   <div className="flex items-center gap-3">
-                    <label className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-slate-700 bg-slate-800 hover:bg-slate-700 cursor-pointer text-sm">
+                    <label className="inline-flex items-center gap-2 px-3 py-2 border border-blue-300 bg-white hover:bg-blue-50 cursor-pointer text-sm text-slate-700">
                       <Upload className="w-4 h-4" /> Subir imagen
                       <input type="file" accept="image/*" className="hidden"
                         onChange={async (e) => {
@@ -223,9 +223,9 @@ export function RnapView({ session }: { session: Session }) {
                     </label>
                     {editor.data.foto && (
                       <div className="flex items-center gap-2">
-                        <img src={editor.data.foto} alt="preview" className="w-12 h-12 object-cover rounded border border-slate-700" />
+                        <img src={editor.data.foto} alt="preview" className="w-12 h-12 object-cover border border-blue-300" />
                         <button type="button" onClick={() => setEditor({ ...editor, data: { ...editor.data, foto: "" } })}
-                          className="text-red-300 hover:text-red-200"><X className="w-4 h-4" /></button>
+                          className="text-red-600 hover:text-red-700"><X className="w-4 h-4" /></button>
                       </div>
                     )}
                   </div>
@@ -233,14 +233,14 @@ export function RnapView({ session }: { session: Session }) {
               </div>
 
               <div>
-                <div className="text-xs text-blue-200 uppercase tracking-wider mb-2">Vista Previa</div>
+                <div className="text-xs text-blue-600 uppercase tracking-wider mb-2">Vista Previa</div>
                 <RnapCard data={editor.data as Cert} />
               </div>
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setEditor(null)} className="border-slate-700">Cancelar</Button>
-              <Button onClick={save} className="bg-blue-700 hover:bg-blue-600">Guardar RNAP</Button>
+              <Button variant="outline" onClick={() => setEditor(null)} className="rounded-none border-blue-300">Cancelar</Button>
+              <Button onClick={save} className="rounded-none bg-blue-600 hover:bg-blue-700 text-white">Guardar RNAP</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -249,9 +249,9 @@ export function RnapView({ session }: { session: Session }) {
       {/* Preview dialog */}
       {preview && (
         <Dialog open={!!preview} onOpenChange={(v) => !v && setPreview(null)}>
-          <DialogContent className="max-w-5xl bg-slate-900 border border-blue-900/60 text-white">
+          <DialogContent className="max-w-5xl bg-white border border-blue-200 text-slate-900 rounded-none">
             <DialogHeader>
-              <DialogTitle className="font-display text-2xl uppercase tracking-wide text-yellow-300">
+              <DialogTitle className="font-display text-2xl uppercase tracking-wide text-blue-700">
                 {preview.nombre_completo}
               </DialogTitle>
             </DialogHeader>
