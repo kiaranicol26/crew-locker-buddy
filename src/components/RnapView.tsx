@@ -97,54 +97,58 @@ export function RnapView({ session }: { session: Session }) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-md border border-yellow-500/50 bg-yellow-500/10 text-yellow-200 px-4 py-3 flex items-center gap-3 font-display">
-        <AlertTriangle className="w-5 h-5 shrink-0" />
-        <span className="text-sm uppercase tracking-wider">
-          Modo de Testeo — esta sección puede contener errores.
-        </span>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-2xl uppercase tracking-widest text-yellow-300">
-          R.N.A.P — Registro Nacional de Antecedentes Penales
-        </h2>
-        {canEmit && (
-          <Button onClick={openCreate} className="bg-blue-700 hover:bg-blue-600">
-            <Plus className="w-4 h-4 mr-1" /> Crear RNAP
-          </Button>
-        )}
+    <div className="space-y-4">
+      <div className="w-full bg-white border border-blue-200 shadow-sm p-5">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white border border-blue-700">
+            <FileText className="w-6 h-6" />
+          </div>
+          <div className="flex-1">
+            <p className="text-blue-600 text-xs uppercase tracking-[0.3em] font-bold">
+              San Andreas Police Department
+            </p>
+            <h2 className="text-2xl font-black text-slate-900 uppercase font-display">
+              R.N.A.P — Registro Nacional de Antecedentes Penales
+            </h2>
+            <p className="text-slate-500 text-sm">Modo de Testeo — esta sección puede contener errores.</p>
+          </div>
+          {canEmit && (
+            <Button onClick={openCreate} className="rounded-none bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+              <Plus className="w-4 h-4 mr-1" /> Crear RNAP
+            </Button>
+          )}
+        </div>
       </div>
 
       {loading ? (
-        <p className="text-slate-400">Cargando…</p>
+        <p className="text-slate-500">Cargando…</p>
       ) : certs.length === 0 ? (
-        <p className="text-slate-400 italic">No hay certificados guardados aún.</p>
+        <p className="text-slate-500 italic">No hay certificados guardados aún.</p>
       ) : (
         <div className="grid gap-3">
           {certs.map(c => (
             <div key={c.id}
-              className="flex items-center justify-between rounded-md border border-blue-900/60 bg-slate-950/60 backdrop-blur px-4 py-3">
+              className="flex items-center justify-between border border-blue-200 bg-white px-4 py-3">
               <button onClick={() => setPreview(c)} className="text-left flex-1">
-                <div className="font-display uppercase tracking-wide text-white text-lg">{c.nombre_completo}</div>
-                <div className="text-xs text-slate-400 font-mono">
+                <div className="font-display uppercase tracking-wide text-slate-900 text-lg">{c.nombre_completo}</div>
+                <div className="text-xs text-slate-500 font-mono">
                   {c.tipo_documento}: {c.numero_documento || "—"} · {c.nacionalidad || "—"}
                 </div>
               </button>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => setPreview(c)}
-                  className="border-slate-700 bg-slate-900 text-white hover:bg-slate-800">
+                  className="rounded-none border-blue-300 bg-white text-slate-700 hover:bg-blue-50">
                   Ver
                 </Button>
                 {canEmit && (
                   <Button size="sm" variant="outline" onClick={() => openEdit(c)}
-                    className="border-slate-700 bg-slate-900 text-white hover:bg-slate-800">
+                    className="rounded-none border-blue-300 bg-white text-slate-700 hover:bg-blue-50">
                     <Pencil className="w-4 h-4" />
                   </Button>
                 )}
                 {canDelete && (
                   <Button size="sm" variant="outline" onClick={() => remove(c)}
-                    className="border-red-900/60 bg-red-950/40 text-red-200 hover:bg-red-900/50">
+                    className="rounded-none border-red-300 bg-red-50 text-red-700 hover:bg-red-100">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 )}
