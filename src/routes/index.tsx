@@ -38,63 +38,74 @@ function Index() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-[#0b1526] via-[#101d31] to-[#0a1120]">
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,.10),transparent_60%)]" />
+    <div className="relative min-h-screen bg-slate-100">
       <div className="relative">
-      <header className="border-b border-slate-700/60 bg-slate-900/80 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-extrabold uppercase tracking-wide text-white font-display">
-              Gestión de la Policía
-            </h1>
-            <p className="text-xs text-slate-400 font-mono mt-1">
-              {session.id} · {session.name}
-              {session.is_alto_mando && (
-                <span className="ml-2 inline-flex items-center gap-1 text-yellow-400">
-                  <Shield className="w-3 h-3" /> Alto Mando
-                </span>
-              )}
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={handleLogout}
-            className="border-slate-700 bg-slate-900 text-white hover:bg-slate-800">
-            <LogOut className="w-4 h-4 mr-1" /> Salir
-          </Button>
-        </div>
-
-        {/* LCPD-style nav */}
-        <div className="max-w-7xl mx-auto px-6">
-          <nav className="flex items-stretch gap-0 border-t-2 border-yellow-400/80">
-            {tabs.map(t => {
-              const active = tab === t.key;
-              return (
-                <button
-                  key={t.key}
-                  onClick={() => setTab(t.key)}
-                  className={`
-                    relative flex-1 px-6 py-3 font-display font-bold uppercase tracking-[0.25em] text-sm
-                    transition-all border-r border-slate-700/50 last:border-r-0
-                    ${active
-                      ? "text-yellow-300 bg-slate-800/80"
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"}
-                  `}
-                >
-                  {t.label}
-                  {active && (
-                    <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-yellow-400" />
+        <header className="border-b border-blue-200 bg-white">
+          <div className="w-full px-4 lg:px-6 py-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white border border-blue-700">
+                <Shield className="w-7 h-7" />
+              </div>
+              <div>
+                <h1 className="text-xl lg:text-2xl font-black uppercase tracking-wide text-slate-900 font-display">
+                  Gestión de la Policía
+                </h1>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">
+                  {session.id} · {session.name}
+                  {session.is_alto_mando && (
+                    <span className="ml-2 inline-flex items-center gap-1 text-blue-700 font-semibold">
+                      <Shield className="w-3 h-3" /> Alto Mando
+                    </span>
                   )}
-                </button>
-              );
-            })}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white border border-blue-700">
+                <span className="text-xs font-mono font-bold">K-105WZRP</span>
+                <span className="text-[10px] uppercase tracking-wider opacity-90">Alto Mando</span>
+              </div>
+              <Button variant="outline" size="sm" onClick={handleLogout}
+                className="rounded-none border-blue-300 bg-white text-slate-700 hover:bg-blue-50">
+                <LogOut className="w-4 h-4 mr-1" /> Salir
+              </Button>
+            </div>
+          </div>
+
+          <nav className="w-full px-4 lg:px-6">
+            <div className="flex items-stretch gap-0 border-t-2 border-blue-600">
+              {tabs.map(t => {
+                const active = tab === t.key;
+                return (
+                  <button
+                    key={t.key}
+                    onClick={() => setTab(t.key)}
+                    className={`
+                      relative flex-1 px-4 lg:px-6 py-3 font-display font-bold uppercase tracking-[0.2em] text-xs lg:text-sm
+                      transition-all border-r border-blue-200 last:border-r-0
+                      ${active
+                        ? "text-blue-700 bg-blue-50"
+                        : "text-slate-500 hover:text-blue-700 hover:bg-blue-50/50"}
+                    `}
+                  >
+                    {t.label}
+                    {active && (
+                      <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-blue-600" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </nav>
-        </div>
-      </header>
-      <main className="max-w-7xl mx-auto p-6">
-        {tab === "records" && <RecordsTable session={session} />}
-        {tab === "aspirantes" && <AspirantesTable session={session} />}
-        {tab === "rnap" && <RnapView session={session} />}
-        {tab === "alto" && session.is_alto_mando && <AltoMando session={session} />}
-      </main>
+        </header>
+
+        <main className="w-full p-4 lg:p-6">
+          {tab === "records" && <RecordsTable session={session} />}
+          {tab === "aspirantes" && <AspirantesTable session={session} />}
+          {tab === "rnap" && <RnapView session={session} />}
+          {tab === "alto" && session.is_alto_mando && <AltoMando session={session} />}
+        </main>
       </div>
     </div>
   );
