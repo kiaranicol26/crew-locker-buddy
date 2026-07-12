@@ -1020,21 +1020,12 @@ export function RecordsTable({
               flex
               items-center
               justify-center
-              bg-blue-600
-              text-white
+              bg-white
               border
-              border-blue-700
+              border-blue-200
+              p-1
             ">
-
-
-              <ShieldCheck
-                className="
-                  w-8
-                  h-8
-                "
-              />
-
-
+              <img src={sapdLogo.url} alt="SAPD" className="w-full h-full object-contain" />
             </div>
 
 
