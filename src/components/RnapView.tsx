@@ -266,7 +266,7 @@ export function RnapView({ session }: { session: Session }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid gap-1">
-      <Label className="text-blue-200 text-xs uppercase tracking-wider">{label}</Label>
+      <Label className="text-blue-600 text-xs uppercase tracking-wider">{label}</Label>
       {children}
     </div>
   );
