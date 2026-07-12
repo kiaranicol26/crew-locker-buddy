@@ -42,33 +42,36 @@ function Index() {
     <div className="relative min-h-screen bg-slate-100">
       <div className="relative">
         <header className="border-b border-blue-200 bg-white">
-          <div className="w-full px-4 lg:px-6 py-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white border border-blue-700">
-                <Shield className="w-7 h-7" />
-              </div>
-              <div>
-                <h1 className="text-xl lg:text-2xl font-black uppercase tracking-wide text-slate-900 font-display">
-                  Gestión de la Policía
+          <div className="w-full px-4 lg:px-6 pt-4 pb-2 relative">
+            {/* Compact centered branding */}
+            <div className="flex flex-col items-center text-center">
+              <p className="text-blue-700 text-[10px] lg:text-xs uppercase font-bold tracking-[0.35em]">
+                San Andreas Police Department
+              </p>
+              <div className="flex items-center gap-3 mt-1">
+                <img src={sapdLogo.url} alt="SAPD" className="w-10 h-10 object-contain" />
+                <h1 className="text-2xl lg:text-3xl font-black uppercase tracking-wide text-slate-900 font-display">
+                  Welcome to <span className="text-blue-700">mySAPD</span>
                 </h1>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">
-                  {session.id} · {session.name}
-                  {session.is_alto_mando && (
-                    <span className="ml-2 inline-flex items-center gap-1 text-blue-700 font-semibold">
-                      <Shield className="w-3 h-3" /> Alto Mando
-                    </span>
-                  )}
-                </p>
               </div>
+              <p className="text-[11px] text-slate-500 font-mono mt-1">
+                {session.id} · {session.name}
+                {session.is_alto_mando && (
+                  <span className="ml-2 inline-flex items-center gap-1 text-blue-700 font-semibold">
+                    <Shield className="w-3 h-3" /> Alto Mando
+                  </span>
+                )}
+              </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white border border-blue-700">
-                <span className="text-xs font-mono font-bold">K-105WZRP</span>
-                <span className="text-[10px] uppercase tracking-wider opacity-90">Alto Mando</span>
+            {/* Top-right actions */}
+            <div className="absolute top-3 right-4 lg:right-6 flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-blue-600 text-white border border-blue-700">
+                <span className="text-[11px] font-mono font-bold">K-105WZRP</span>
+                <span className="text-[9px] uppercase tracking-wider opacity-90">Alto Mando</span>
               </div>
               <Button variant="outline" size="sm" onClick={handleLogout}
-                className="rounded-none border-blue-300 bg-white text-slate-700 hover:bg-blue-50">
+                className="rounded-none border-blue-300 bg-white text-slate-700 hover:bg-blue-50 h-8">
                 <LogOut className="w-4 h-4 mr-1" /> Salir
               </Button>
             </div>
