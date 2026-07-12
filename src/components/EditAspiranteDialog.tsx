@@ -84,44 +84,44 @@ export function EditAspiranteDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl bg-slate-900 border border-blue-900/60 text-white max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl bg-white border border-blue-200 text-slate-900 rounded-none max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl uppercase tracking-wide text-yellow-400">
+          <DialogTitle className="font-display text-2xl uppercase tracking-wide text-blue-700">
             Editar Aspirante
           </DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-2">
           <div className="flex items-center gap-3">
-            <Label className="w-32 text-blue-200">Pasa</Label>
+            <Label className="w-32 text-slate-600">Pasa</Label>
             <PasaSelector value={form.pasa} onChange={v => setForm({ ...form, pasa: v })} />
           </div>
 
           <Field label="Nombre">
-            <Input value={form.nombre ?? ""} onChange={e => setForm({ ...form, nombre: e.target.value })} className="bg-slate-800 border-slate-700 text-white" />
+            <Input value={form.nombre ?? ""} onChange={e => setForm({ ...form, nombre: e.target.value })} className="rounded-none border-blue-300 bg-white text-slate-800" />
           </Field>
           <Field label="Discord (DP)">
-            <Input value={form.dp ?? ""} onChange={e => setForm({ ...form, dp: e.target.value })} className="bg-slate-800 border-slate-700 text-white" />
+            <Input value={form.dp ?? ""} onChange={e => setForm({ ...form, dp: e.target.value })} className="rounded-none border-blue-300 bg-white text-slate-800" />
           </Field>
           <Field label="Instructor">
-            <Input value={form.instructor ?? ""} onChange={e => setForm({ ...form, instructor: e.target.value })} className="bg-slate-800 border-slate-700 text-white" />
+            <Input value={form.instructor ?? ""} onChange={e => setForm({ ...form, instructor: e.target.value })} className="rounded-none border-blue-300 bg-white text-slate-800" />
           </Field>
           <div className="grid grid-cols-2 gap-4">
             <Field label="Punt. Selección (0-10)">
-              <Input type="number" min={0} max={10} step={0.1} value={form.puntuacion_seleccion ?? ""} onChange={e => setScore("puntuacion_seleccion", e.target.value)} className="bg-slate-800 border-slate-700 text-white" />
+              <Input type="number" min={0} max={10} step={0.1} value={form.puntuacion_seleccion ?? ""} onChange={e => setScore("puntuacion_seleccion", e.target.value)} className="rounded-none border-blue-300 bg-white text-slate-800" />
             </Field>
             <Field label="Punt. Final (0-10)">
-              <Input type="number" min={0} max={10} step={0.1} value={form.puntuacion_final ?? ""} onChange={e => setScore("puntuacion_final", e.target.value)} className="bg-slate-800 border-slate-700 text-white" />
+              <Input type="number" min={0} max={10} step={0.1} value={form.puntuacion_final ?? ""} onChange={e => setScore("puntuacion_final", e.target.value)} className="rounded-none border-blue-300 bg-white text-slate-800" />
             </Field>
           </div>
           <Field label="Notas adicionales">
-            <Textarea value={form.notas ?? ""} onChange={e => setForm({ ...form, notas: e.target.value })} className="bg-slate-800 border-slate-700 text-white min-h-[80px]" />
+            <Textarea value={form.notas ?? ""} onChange={e => setForm({ ...form, notas: e.target.value })} className="rounded-none border-blue-300 bg-white text-slate-800 min-h-[80px]" />
           </Field>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="border-slate-700">Cancelar</Button>
-          <Button onClick={save} className="bg-blue-700 hover:bg-blue-600">Guardar Cambios</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-none border-blue-300">Cancelar</Button>
+          <Button onClick={save} className="rounded-none bg-blue-600 hover:bg-blue-700 text-white">Guardar Cambios</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -131,7 +131,7 @@ export function EditAspiranteDialog({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid gap-1">
-      <Label className="text-blue-200 text-xs uppercase tracking-wider">{label}</Label>
+      <Label className="text-slate-600 text-xs uppercase tracking-wider">{label}</Label>
       {children}
     </div>
   );
