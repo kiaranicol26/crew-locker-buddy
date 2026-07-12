@@ -67,8 +67,8 @@ export function LoginView() {
 
             <div className="bg-white border-b border-blue-200 px-6 py-5 flex items-center justify-between gap-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white border border-blue-700">
-                  <Shield className="w-7 h-7" />
+                <div className="w-12 h-12 flex items-center justify-center bg-white border border-blue-200 p-1">
+                  <img src={sapdLogo.url} alt="SAPD" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <h1 className="text-blue-700 font-display font-extrabold text-3xl tracking-wider">
