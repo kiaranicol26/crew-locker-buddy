@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Shield } from "lucide-react";
+import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 
 export function LoginView() {
   const [id, setId] = useState("");
