@@ -114,8 +114,8 @@ export function AspirantesTable({ session }: { session: Session }) {
       <div className="w-full bg-white border border-blue-200 shadow-sm p-5">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 flex items-center justify-center bg-blue-600 text-white border border-blue-700">
-              <span className="text-lg font-black">A</span>
+            <div className="w-12 h-12 flex items-center justify-center bg-white border border-blue-200 p-1">
+              <img src={sapdLogo.url} alt="SAPD" className="w-full h-full object-contain" />
             </div>
             <div>
               <p className="text-blue-600 text-xs uppercase font-bold tracking-[0.3em]">
