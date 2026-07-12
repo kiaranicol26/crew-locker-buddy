@@ -1,0 +1,46 @@
+name: Discord Commit Notification
+
+on:
+  push:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Discord Embed
+        run: |
+          HORA=$(TZ='America/Argentina/Buenos_Aires' date '+%H:%M')
+
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{
+            \"username\": \"Ministerio de Seguridad\",
+            \"embeds\": [{
+              \"title\": \"📢 Nueva actualización\",
+              \"description\": \"Se realizaron cambios en la **Web Gestión de SAPD**.\",
+              \"color\": 3447003,
+              \"fields\": [
+                {
+                  \"name\": \"👮 Autor\",
+                  \"value\": \"Kendo <@564161518027931650>\",
+                  \"inline\": true
+                },
+                {
+                  \"name\": \"🕒 Hora de Edición\",
+                  \"value\": \"$HORA\",
+                  \"inline\": true
+                },
+                {
+                  \"name\": \"📝 Cambios realizados\",
+                  \"value\": \"${{ github.event.head_commit.message }}\",
+                  \"inline\": false
+                }
+              ],
+              \"footer\": {
+                \"text\": \"Web Gestión de SAPD\"
+              },
+              \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+            }]
+          }" \
+          "${{ secrets.DISCORD_WEBHOOK }}"
