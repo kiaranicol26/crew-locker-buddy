@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, logAction } from "@/lib/session";
 import { Button } from "@/components/ui/button";
