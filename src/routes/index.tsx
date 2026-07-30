@@ -6,6 +6,7 @@ import { AspirantesTable } from "@/components/AspirantesTable";
 import { AltoMando } from "@/components/AltoMando";
 import { RnapView } from "@/components/RnapView";
 import { SalarioView } from "@/components/SalarioView";
+import { ListaPdView } from "@/components/ListaPdView";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Shield } from "lucide-react";
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const session = useSession();
-  const [tab, setTab] = useState<"records" | "aspirantes" | "rnap" | "salario" | "alto">("records");
+  const [tab, setTab] = useState<"records" | "aspirantes" | "rnap" | "listapd" | "salario" | "alto">("records");
 
   if (!session) return <LoginView />;
 
@@ -36,6 +37,7 @@ function Index() {
     { key: "records", label: "EX POLICÍAS" },
     { key: "aspirantes", label: "ASPIRANTES" },
     { key: "rnap", label: "R.N.A.P" },
+    { key: "listapd", label: "LISTA PD" },
     ...(session.is_alto_mando
       ? [{ key: "salario" as const, label: "SALARIO" }, { key: "alto" as const, label: "ALTO MANDO" }]
       : []),
