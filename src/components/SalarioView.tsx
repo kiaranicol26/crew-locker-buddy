@@ -25,16 +25,20 @@ type Entry = {
   ultima_edicion_por: string | null;
 };
 
+type PdMember = { id: string; nombre: string; rango: string | null };
+
 export function SalarioView({ session }: { session: Session }) {
   const [months, setMonths] = useState<Month[]>([]);
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [pd, setPd] = useState<PdMember[]>([]);
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [newMonth, setNewMonth] = useState("");
 
   async function loadAll() {
-    const [m, e] = await Promise.all([
+    const [m, e, p] = await Promise.all([
       supabase.from("salary_months").select("*").order("created_at", { ascending: false }),
       supabase.from("salary_entries").select("*").order("created_at", { ascending: true }),
+      supabase.from("pd_members").select("id, nombre, rango").order("nombre", { ascending: true }),
     ]);
     if (m.data) {
       setMonths(m.data as Month[]);
@@ -45,21 +49,45 @@ export function SalarioView({ session }: { session: Session }) {
       });
     }
     if (e.data) setEntries(e.data as Entry[]);
+    if (p.data) setPd(p.data as PdMember[]);
   }
 
   useEffect(() => { loadAll(); }, []);
+
+  async function syncMonth(monthId: string, existing: string[], silent = false) {
+    const missing = pd.filter(p => !existing.includes(p.nombre));
+    if (missing.length === 0) {
+      if (!silent) toast.info("La tabla ya tiene a toda la Lista PD");
+      return;
+    }
+    const { error } = await supabase.from("salary_entries").insert(
+      missing.map(p => ({
+        month_id: monthId, nombre: p.nombre, paga: 0, pagado: false,
+        ultima_edicion_por: session.name,
+      })) as any,
+    );
+    if (error) return toast.error(error.message);
+    if (!silent) toast.success(`${missing.length} agentes cargados desde la Lista PD`);
+    loadAll();
+  }
 
   async function addMonth(ev: React.FormEvent) {
     ev.preventDefault();
     const label = newMonth.trim();
     if (!label) return toast.error("Escribe el nombre del mes");
-    const { error } = await supabase.from("salary_months").insert({ label, created_by: session.id } as any);
+    const { data, error } = await supabase
+      .from("salary_months")
+      .insert({ label, created_by: session.id } as any)
+      .select("id")
+      .maybeSingle();
     if (error) return toast.error(error.message);
     await logAction(supabase, session, "CREATE_SALARY_MONTH", { label });
+    if (data?.id) await syncMonth(data.id as string, [], true);
     setNewMonth("");
-    toast.success(`Mes "${label}" creado`);
+    toast.success(`Mes "${label}" creado con la Lista PD`);
     loadAll();
   }
+
 
   async function removeMonth(m: Month) {
     if (!confirm(`¿Eliminar la tabla de "${m.label}" y todos sus registros?`)) return;
