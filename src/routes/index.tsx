@@ -5,6 +5,7 @@ import { RecordsTable } from "@/components/RecordsTable";
 import { AspirantesTable } from "@/components/AspirantesTable";
 import { AltoMando } from "@/components/AltoMando";
 import { RnapView } from "@/components/RnapView";
+import { SalarioView } from "@/components/SalarioView";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Shield } from "lucide-react";
