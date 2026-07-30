@@ -224,13 +224,15 @@ export function SalarioView({ session }: { session: Session }) {
                         <tr key={r.id} className="border-t border-slate-200 hover:bg-blue-50 transition-colors">
                           <td className="p-2 border border-slate-200">
                             <Input
+                              list="pd-members-list"
                               value={r.nombre ?? ""}
                               onChange={e => patchLocal(r.id, { nombre: e.target.value })}
                               onBlur={e => saveEntry(r.id, { nombre: e.target.value })}
-                              placeholder="Nombre del agente"
-                              className="h-9 rounded-none border-slate-200 bg-white text-slate-800"
+                              placeholder="Nombre_Apellido"
+                              className="h-9 rounded-none border-slate-200 bg-white text-slate-800 font-mono"
                             />
                           </td>
+
                           <td className="p-3 border border-slate-200 text-slate-600 whitespace-nowrap">{m.label}</td>
                           <td className="p-2 border border-slate-200">
                             <Input
