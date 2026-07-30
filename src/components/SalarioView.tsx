@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Trash2, Plus, ChevronDown, ChevronRight, Coins } from "lucide-react";
+import { Trash2, Plus, ChevronDown, ChevronRight, Coins, Users } from "lucide-react";
 
 type Month = {
   id: string;
@@ -189,10 +189,16 @@ export function SalarioView({ session }: { session: Session }) {
                 <span className="text-xs text-slate-400 font-mono">{rows.length} agentes</span>
               </button>
               <div className="flex items-center gap-2">
+                <Button size="sm" variant="outline"
+                  onClick={() => syncMonth(m.id, rows.map(r => r.nombre ?? ""))}
+                  className="h-9 rounded-none border-blue-300 bg-white text-blue-700 hover:bg-blue-50">
+                  <Users className="w-4 h-4 mr-1" /> Cargar Lista PD
+                </Button>
                 <Button size="sm" onClick={() => addEntry(m.id)}
                   className="h-9 rounded-none bg-blue-600 hover:bg-blue-700 text-white">
                   <Plus className="w-4 h-4 mr-1" /> Agente
                 </Button>
+
                 <Button size="icon" variant="ghost" onClick={() => removeMonth(m)}
                   className="h-9 w-9 rounded-none hover:bg-red-100">
                   <Trash2 className="w-4 h-4 text-red-600" />
