@@ -113,6 +113,7 @@ function Index() {
           {tab === "records" && <RecordsTable session={session} />}
           {tab === "aspirantes" && <AspirantesTable session={session} />}
           {tab === "rnap" && <RnapView session={session} />}
+          {tab === "listapd" && <ListaPdView session={session} />}
           {tab === "salario" && session.is_alto_mando && <SalarioView session={session} />}
           {tab === "alto" && session.is_alto_mando && <AltoMando session={session} />}
         </main>
