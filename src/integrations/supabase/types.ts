@@ -236,6 +236,71 @@ export type Database = {
         }
         Relationships: []
       }
+      salary_entries: {
+        Row: {
+          created_at: string
+          id: string
+          month_id: string
+          nombre: string | null
+          paga: number
+          pagado: boolean
+          ultima_edicion_por: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          month_id: string
+          nombre?: string | null
+          paga?: number
+          pagado?: boolean
+          ultima_edicion_por?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          month_id?: string
+          nombre?: string | null
+          paga?: number
+          pagado?: boolean
+          ultima_edicion_por?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salary_entries_month_id_fkey"
+            columns: ["month_id"]
+            isOneToOne: false
+            referencedRelation: "salary_months"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      salary_months: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

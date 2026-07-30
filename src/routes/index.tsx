@@ -5,6 +5,7 @@ import { RecordsTable } from "@/components/RecordsTable";
 import { AspirantesTable } from "@/components/AspirantesTable";
 import { AltoMando } from "@/components/AltoMando";
 import { RnapView } from "@/components/RnapView";
+import { SalarioView } from "@/components/SalarioView";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Shield } from "lucide-react";
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const session = useSession();
-  const [tab, setTab] = useState<"records" | "aspirantes" | "rnap" | "alto">("records");
+  const [tab, setTab] = useState<"records" | "aspirantes" | "rnap" | "salario" | "alto">("records");
 
   if (!session) return <LoginView />;
 
@@ -35,7 +36,9 @@ function Index() {
     { key: "records", label: "EX POLICÍAS" },
     { key: "aspirantes", label: "ASPIRANTES" },
     { key: "rnap", label: "R.N.A.P" },
-    ...(session.is_alto_mando ? [{ key: "alto" as const, label: "ALTO MANDO" }] : []),
+    ...(session.is_alto_mando
+      ? [{ key: "salario" as const, label: "SALARIO" }, { key: "alto" as const, label: "ALTO MANDO" }]
+      : []),
   ];
 
   return (
@@ -108,6 +111,7 @@ function Index() {
           {tab === "records" && <RecordsTable session={session} />}
           {tab === "aspirantes" && <AspirantesTable session={session} />}
           {tab === "rnap" && <RnapView session={session} />}
+          {tab === "salario" && session.is_alto_mando && <SalarioView session={session} />}
           {tab === "alto" && session.is_alto_mando && <AltoMando session={session} />}
         </main>
       </div>
