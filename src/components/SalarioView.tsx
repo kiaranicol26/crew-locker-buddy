@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Trash2, Plus, ChevronDown, ChevronRight, Coins } from "lucide-react";
+import { Trash2, Plus, ChevronDown, ChevronRight, Coins, Users } from "lucide-react";
 
 type Month = {
   id: string;
@@ -25,16 +25,20 @@ type Entry = {
   ultima_edicion_por: string | null;
 };
 
+type PdMember = { id: string; nombre: string; rango: string | null };
+
 export function SalarioView({ session }: { session: Session }) {
   const [months, setMonths] = useState<Month[]>([]);
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [pd, setPd] = useState<PdMember[]>([]);
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [newMonth, setNewMonth] = useState("");
 
   async function loadAll() {
-    const [m, e] = await Promise.all([
+    const [m, e, p] = await Promise.all([
       supabase.from("salary_months").select("*").order("created_at", { ascending: false }),
       supabase.from("salary_entries").select("*").order("created_at", { ascending: true }),
+      supabase.from("pd_members").select("id, nombre, rango").order("nombre", { ascending: true }),
     ]);
     if (m.data) {
       setMonths(m.data as Month[]);
@@ -45,21 +49,45 @@ export function SalarioView({ session }: { session: Session }) {
       });
     }
     if (e.data) setEntries(e.data as Entry[]);
+    if (p.data) setPd(p.data as PdMember[]);
   }
 
   useEffect(() => { loadAll(); }, []);
+
+  async function syncMonth(monthId: string, existing: string[], silent = false) {
+    const missing = pd.filter(p => !existing.includes(p.nombre));
+    if (missing.length === 0) {
+      if (!silent) toast.info("La tabla ya tiene a toda la Lista PD");
+      return;
+    }
+    const { error } = await supabase.from("salary_entries").insert(
+      missing.map(p => ({
+        month_id: monthId, nombre: p.nombre, paga: 0, pagado: false,
+        ultima_edicion_por: session.name,
+      })) as any,
+    );
+    if (error) return toast.error(error.message);
+    if (!silent) toast.success(`${missing.length} agentes cargados desde la Lista PD`);
+    loadAll();
+  }
 
   async function addMonth(ev: React.FormEvent) {
     ev.preventDefault();
     const label = newMonth.trim();
     if (!label) return toast.error("Escribe el nombre del mes");
-    const { error } = await supabase.from("salary_months").insert({ label, created_by: session.id } as any);
+    const { data, error } = await supabase
+      .from("salary_months")
+      .insert({ label, created_by: session.id } as any)
+      .select("id")
+      .maybeSingle();
     if (error) return toast.error(error.message);
     await logAction(supabase, session, "CREATE_SALARY_MONTH", { label });
+    if (data?.id) await syncMonth(data.id as string, [], true);
     setNewMonth("");
-    toast.success(`Mes "${label}" creado`);
+    toast.success(`Mes "${label}" creado con la Lista PD`);
     loadAll();
   }
+
 
   async function removeMonth(m: Month) {
     if (!confirm(`¿Eliminar la tabla de "${m.label}" y todos sus registros?`)) return;
@@ -101,6 +129,10 @@ export function SalarioView({ session }: { session: Session }) {
 
   return (
     <div className="space-y-4">
+      <datalist id="pd-members-list">
+        {pd.map(p => <option key={p.id} value={p.nombre} />)}
+      </datalist>
+
       {/* CABECERA / AÑADIR MES */}
       <Card className="overflow-hidden border border-blue-200 bg-white shadow-sm rounded-none">
         <div className="h-1 bg-blue-600" />
@@ -161,10 +193,16 @@ export function SalarioView({ session }: { session: Session }) {
                 <span className="text-xs text-slate-400 font-mono">{rows.length} agentes</span>
               </button>
               <div className="flex items-center gap-2">
+                <Button size="sm" variant="outline"
+                  onClick={() => syncMonth(m.id, rows.map(r => r.nombre ?? ""))}
+                  className="h-9 rounded-none border-blue-300 bg-white text-blue-700 hover:bg-blue-50">
+                  <Users className="w-4 h-4 mr-1" /> Cargar Lista PD
+                </Button>
                 <Button size="sm" onClick={() => addEntry(m.id)}
                   className="h-9 rounded-none bg-blue-600 hover:bg-blue-700 text-white">
                   <Plus className="w-4 h-4 mr-1" /> Agente
                 </Button>
+
                 <Button size="icon" variant="ghost" onClick={() => removeMonth(m)}
                   className="h-9 w-9 rounded-none hover:bg-red-100">
                   <Trash2 className="w-4 h-4 text-red-600" />
@@ -190,13 +228,15 @@ export function SalarioView({ session }: { session: Session }) {
                         <tr key={r.id} className="border-t border-slate-200 hover:bg-blue-50 transition-colors">
                           <td className="p-2 border border-slate-200">
                             <Input
+                              list="pd-members-list"
                               value={r.nombre ?? ""}
                               onChange={e => patchLocal(r.id, { nombre: e.target.value })}
                               onBlur={e => saveEntry(r.id, { nombre: e.target.value })}
-                              placeholder="Nombre del agente"
-                              className="h-9 rounded-none border-slate-200 bg-white text-slate-800"
+                              placeholder="Nombre_Apellido"
+                              className="h-9 rounded-none border-slate-200 bg-white text-slate-800 font-mono"
                             />
                           </td>
+
                           <td className="p-3 border border-slate-200 text-slate-600 whitespace-nowrap">{m.label}</td>
                           <td className="p-2 border border-slate-200">
                             <Input

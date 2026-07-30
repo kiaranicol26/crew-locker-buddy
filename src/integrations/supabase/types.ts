@@ -137,6 +137,33 @@ export type Database = {
         }
         Relationships: []
       }
+      pd_members: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          nombre: string
+          rango: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nombre: string
+          rango?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nombre?: string
+          rango?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       records: {
         Row: {
           created_at: string
