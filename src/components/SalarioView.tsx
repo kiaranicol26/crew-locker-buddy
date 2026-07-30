@@ -129,6 +129,10 @@ export function SalarioView({ session }: { session: Session }) {
 
   return (
     <div className="space-y-4">
+      <datalist id="pd-members-list">
+        {pd.map(p => <option key={p.id} value={p.nombre} />)}
+      </datalist>
+
       {/* CABECERA / AÑADIR MES */}
       <Card className="overflow-hidden border border-blue-200 bg-white shadow-sm rounded-none">
         <div className="h-1 bg-blue-600" />
