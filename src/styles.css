@@ -138,14 +138,30 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-display);
+    font-weight: 600;
   }
 
   h1, h2, h3, h4, h5, h6, .font-display {
     font-family: var(--font-display);
+    font-weight: 800;
     letter-spacing: 0.01em;
   }
 
   .font-table {
     font-family: var(--font-table);
+    font-weight: 600;
+  }
+
+  /* Subtle non-white interior for all tables */
+  table.font-table tbody tr {
+    background-color: oklch(0.975 0.012 255);
+  }
+
+  table.font-table tbody tr:nth-child(even) {
+    background-color: oklch(0.955 0.018 255);
+  }
+
+  table.font-table thead th {
+    font-weight: 800;
   }
 }

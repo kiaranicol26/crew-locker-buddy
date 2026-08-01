@@ -13,8 +13,10 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { getBackground, setBackground, fileToCompressedDataUrl } from "@/lib/appearance";
 import { toast } from "sonner";
-import { Trash2, Shield, Webhook, FileText } from "lucide-react";
+import { Trash2, Shield, Webhook, FileText, Image as ImageIcon } from "lucide-react";
+
 
 type Instructor = {
   id: string;
@@ -47,6 +49,9 @@ export function AltoMando({ session }: { session: Session }) {
   const [savingHook, setSavingHook] = useState(false);
   const [rnapHook, setRnapHook] = useState("");
   const [savingRnap, setSavingRnap] = useState(false);
+  const [bg, setBg] = useState("");
+  const [savingBg, setSavingBg] = useState(false);
+
 
   async function loadAll() {
     const [i, l] = await Promise.all([
@@ -61,7 +66,28 @@ export function AltoMando({ session }: { session: Session }) {
     loadAll();
     getWebhookUrl(true).then(setWebhook);
     getRnapWebhookUrl(true).then(setRnapHook);
+    getBackground().then(setBg);
   }, []);
+
+  async function saveBg(value: string) {
+    setSavingBg(true);
+    try {
+      await setBackground(value);
+      setBg(value);
+      await logAction(supabase, session, "UPDATE_BACKGROUND", { value: value ? "(set)" : "(cleared)" });
+      toast.success(value ? "Fondo actualizado" : "Fondo restaurado");
+    } catch (e: any) { toast.error(e.message ?? "Error"); }
+    finally { setSavingBg(false); }
+  }
+
+  async function onBgFile(file?: File | null) {
+    if (!file) return;
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file);
+      await saveBg(dataUrl);
+    } catch (e: any) { toast.error(e.message ?? "Error al subir la imagen"); }
+  }
+
 
   async function saveWebhook() {
     setSavingHook(true);
@@ -215,6 +241,47 @@ export function AltoMando({ session }: { session: Session }) {
           </div>
         </Card>
       </div>
+
+      {/* FONDO DE LA WEB */}
+      <Card className="overflow-hidden border-2 border-blue-300 bg-white shadow-md rounded-none">
+        <div className="h-1.5 bg-blue-700" />
+        <div className="p-5 space-y-4">
+          <div className="flex items-center gap-3">
+            <ImageIcon className="w-5 h-5 text-blue-700" />
+            <h2 className="text-xl font-black uppercase tracking-wide text-slate-900 font-display">
+              Fondo de la Web
+            </h2>
+          </div>
+          <p className="text-slate-500 text-sm font-semibold">
+            Pega un enlace de imagen o sube una desde tu equipo. Se mostrará detrás de las tablas.
+          </p>
+          <div className="flex flex-col lg:flex-row gap-3">
+            <Input value={bg.startsWith("data:") ? "" : bg}
+              onChange={e => setBg(e.target.value)}
+              placeholder={bg.startsWith("data:") ? "(imagen subida)" : "https://…/fondo.jpg"}
+              className="h-11 rounded-none border-blue-300 bg-white text-slate-800 font-mono text-sm" />
+            <Button onClick={() => saveBg(bg)} disabled={savingBg}
+              className="h-11 rounded-none bg-blue-700 hover:bg-blue-800 text-white font-bold">
+              {savingBg ? "..." : "Guardar enlace"}
+            </Button>
+            <label className="h-11 px-4 inline-flex items-center justify-center border-2 border-blue-300 bg-white text-blue-800 font-bold cursor-pointer hover:bg-blue-50">
+              Subir imagen
+              <input type="file" accept="image/*" className="hidden"
+                onChange={e => onBgFile(e.target.files?.[0])} />
+            </label>
+            <Button variant="outline" onClick={() => saveBg("")} disabled={savingBg}
+              className="h-11 rounded-none border-blue-300 bg-white text-slate-700 font-bold">
+              Quitar fondo
+            </Button>
+          </div>
+          {bg && (
+            <div className="border-2 border-blue-300 h-32 bg-slate-100 bg-center bg-cover"
+              style={{ backgroundImage: `url(${bg})` }} />
+          )}
+        </div>
+      </Card>
+
+
 
       {/* INSTRUCTORES + PERMISOS */}
       <Card className="overflow-hidden border border-blue-200 bg-white shadow-sm rounded-none">

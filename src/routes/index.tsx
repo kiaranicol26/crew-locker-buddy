@@ -10,12 +10,14 @@ import { ListaPdView } from "@/components/ListaPdView";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Shield } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getBackground } from "@/lib/appearance";
+
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Gestión de la Policía · SAPD" },
+      { title: "mySAPD · Gestión interna del San Andreas Police Department" },
       { name: "description", content: "Sistema interno del San Andreas Police Department" },
     ],
   }),
@@ -25,6 +27,14 @@ export const Route = createFileRoute("/")({
 function Index() {
   const session = useSession();
   const [tab, setTab] = useState<"records" | "aspirantes" | "rnap" | "listapd" | "salario" | "alto">("records");
+  const [bg, setBg] = useState("");
+
+  useEffect(() => {
+    const load = () => getBackground().then(setBg).catch(() => {});
+    load();
+    window.addEventListener("background-change", load);
+    return () => window.removeEventListener("background-change", load);
+  }, []);
 
   if (!session) return <LoginView />;
 
@@ -44,9 +54,14 @@ function Index() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-slate-100">
+    <div
+      className="relative min-h-screen bg-slate-200 bg-center bg-cover bg-fixed font-semibold"
+      style={bg ? { backgroundImage: `url(${bg})` } : undefined}
+    >
+      {bg && <div className="absolute inset-0 bg-slate-900/40" />}
+
       <div className="relative">
-        <header className="border-b border-blue-200 bg-white">
+        <header className="border-b-2 border-blue-300 bg-white/95 backdrop-blur shadow-sm">
           <div className="w-full px-4 lg:px-6 pt-4 pb-2 relative">
             {/* Compact centered branding */}
             <div className="flex flex-col items-center text-center">
@@ -91,7 +106,7 @@ function Index() {
                     key={t.key}
                     onClick={() => setTab(t.key)}
                     className={`
-                      relative flex-1 px-4 lg:px-6 py-3 font-display font-bold uppercase tracking-[0.2em] text-xs lg:text-sm
+                      relative flex-1 px-4 lg:px-6 py-3 font-display font-extrabold uppercase tracking-[0.2em] text-xs lg:text-sm
                       transition-all border-r border-blue-200 last:border-r-0
                       ${active
                         ? "text-blue-700 bg-blue-50"
