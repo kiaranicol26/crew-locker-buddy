@@ -66,7 +66,28 @@ export function AltoMando({ session }: { session: Session }) {
     loadAll();
     getWebhookUrl(true).then(setWebhook);
     getRnapWebhookUrl(true).then(setRnapHook);
+    getBackground().then(setBg);
   }, []);
+
+  async function saveBg(value: string) {
+    setSavingBg(true);
+    try {
+      await setBackground(value);
+      setBg(value);
+      await logAction(supabase, session, "UPDATE_BACKGROUND", { value: value ? "(set)" : "(cleared)" });
+      toast.success(value ? "Fondo actualizado" : "Fondo restaurado");
+    } catch (e: any) { toast.error(e.message ?? "Error"); }
+    finally { setSavingBg(false); }
+  }
+
+  async function onBgFile(file?: File | null) {
+    if (!file) return;
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file);
+      await saveBg(dataUrl);
+    } catch (e: any) { toast.error(e.message ?? "Error al subir la imagen"); }
+  }
+
 
   async function saveWebhook() {
     setSavingHook(true);
