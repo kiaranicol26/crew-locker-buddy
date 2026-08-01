@@ -25,6 +25,14 @@ export const Route = createFileRoute("/")({
 function Index() {
   const session = useSession();
   const [tab, setTab] = useState<"records" | "aspirantes" | "rnap" | "listapd" | "salario" | "alto">("records");
+  const [bg, setBg] = useState("");
+
+  useEffect(() => {
+    const load = () => getBackground().then(setBg).catch(() => {});
+    load();
+    window.addEventListener("background-change", load);
+    return () => window.removeEventListener("background-change", load);
+  }, []);
 
   if (!session) return <LoginView />;
 
@@ -44,7 +52,12 @@ function Index() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-slate-100">
+    <div
+      className="relative min-h-screen bg-slate-200 bg-center bg-cover bg-fixed font-semibold"
+      style={bg ? { backgroundImage: `url(${bg})` } : undefined}
+    >
+      {bg && <div className="absolute inset-0 bg-slate-900/40" />}
+
       <div className="relative">
         <header className="border-b border-blue-200 bg-white">
           <div className="w-full px-4 lg:px-6 pt-4 pb-2 relative">
