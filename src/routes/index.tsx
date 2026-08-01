@@ -10,7 +10,9 @@ import { ListaPdView } from "@/components/ListaPdView";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Shield } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getBackground } from "@/lib/appearance";
+
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
