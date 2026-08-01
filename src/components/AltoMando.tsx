@@ -49,6 +49,9 @@ export function AltoMando({ session }: { session: Session }) {
   const [savingHook, setSavingHook] = useState(false);
   const [rnapHook, setRnapHook] = useState("");
   const [savingRnap, setSavingRnap] = useState(false);
+  const [bg, setBg] = useState("");
+  const [savingBg, setSavingBg] = useState(false);
+
 
   async function loadAll() {
     const [i, l] = await Promise.all([
