@@ -17,7 +17,7 @@ import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Gestión de la Policía · SAPD" },
+      { title: "mySAPD · Gestión interna del San Andreas Police Department" },
       { name: "description", content: "Sistema interno del San Andreas Police Department" },
     ],
   }),
@@ -61,7 +61,7 @@ function Index() {
       {bg && <div className="absolute inset-0 bg-slate-900/40" />}
 
       <div className="relative">
-        <header className="border-b border-blue-200 bg-white">
+        <header className="border-b-2 border-blue-300 bg-white/95 backdrop-blur shadow-sm">
           <div className="w-full px-4 lg:px-6 pt-4 pb-2 relative">
             {/* Compact centered branding */}
             <div className="flex flex-col items-center text-center">
@@ -106,7 +106,7 @@ function Index() {
                     key={t.key}
                     onClick={() => setTab(t.key)}
                     className={`
-                      relative flex-1 px-4 lg:px-6 py-3 font-display font-bold uppercase tracking-[0.2em] text-xs lg:text-sm
+                      relative flex-1 px-4 lg:px-6 py-3 font-display font-extrabold uppercase tracking-[0.2em] text-xs lg:text-sm
                       transition-all border-r border-blue-200 last:border-r-0
                       ${active
                         ? "text-blue-700 bg-blue-50"
