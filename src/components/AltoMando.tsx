@@ -13,8 +13,10 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { getBackground, setBackground, fileToCompressedDataUrl } from "@/lib/appearance";
 import { toast } from "sonner";
-import { Trash2, Shield, Webhook, FileText } from "lucide-react";
+import { Trash2, Shield, Webhook, FileText, Image as ImageIcon } from "lucide-react";
+
 
 type Instructor = {
   id: string;
