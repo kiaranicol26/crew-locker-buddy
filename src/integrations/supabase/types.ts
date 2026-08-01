@@ -141,25 +141,31 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          es_instructor: boolean
           id: string
           nombre: string
           rango: string | null
+          sueldo_defecto: number
           updated_at: string
         }
         Insert: {
           created_at?: string
           created_by?: string | null
+          es_instructor?: boolean
           id?: string
           nombre: string
           rango?: string | null
+          sueldo_defecto?: number
           updated_at?: string
         }
         Update: {
           created_at?: string
           created_by?: string | null
+          es_instructor?: boolean
           id?: string
           nombre?: string
           rango?: string | null
+          sueldo_defecto?: number
           updated_at?: string
         }
         Relationships: []
@@ -266,6 +272,7 @@ export type Database = {
       salary_entries: {
         Row: {
           created_at: string
+          es_instructor: boolean
           id: string
           month_id: string
           nombre: string | null
@@ -276,6 +283,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          es_instructor?: boolean
           id?: string
           month_id: string
           nombre?: string | null
@@ -286,6 +294,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          es_instructor?: boolean
           id?: string
           month_id?: string
           nombre?: string | null
