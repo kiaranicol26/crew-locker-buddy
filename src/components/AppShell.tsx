@@ -122,10 +122,3 @@ export function AppShell({
   );
 }
 
-export function RequireSession({
-  children,
-}: {
-  children: (session: Session) => ReactNode;
-}) {
-  return <>{children}</>;
-}

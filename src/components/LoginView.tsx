@@ -162,6 +162,14 @@ export function LoginView() {
                 </Button>
               </form>
 
+              <Button asChild variant="outline"
+                className="mt-4 h-11 w-full rounded-none border-blue-300 bg-white text-blue-800 font-bold tracking-wider hover:bg-blue-50">
+                <Link to="/salario">
+                  <Coins className="w-4 h-4 mr-2" /> VER SALARIOS (PÚBLICO)
+                </Link>
+              </Button>
+
+
               <div className="mt-8">
                 <div className="border-t border-blue-200 pt-5">
                   <p className="text-center text-xs uppercase tracking-[0.25em] text-slate-500">
