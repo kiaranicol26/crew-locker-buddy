@@ -9,8 +9,50 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SalarioRouteImport } from './routes/salario'
+import { Route as RnapRouteImport } from './routes/rnap'
+import { Route as PoliciasRouteImport } from './routes/policias'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ExsapdRouteImport } from './routes/exsapd'
+import { Route as AspirantesRouteImport } from './routes/aspirantes'
+import { Route as AltoMandoRouteImport } from './routes/alto-mando'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SalarioRoute = SalarioRouteImport.update({
+  id: '/salario',
+  path: '/salario',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RnapRoute = RnapRouteImport.update({
+  id: '/rnap',
+  path: '/rnap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoliciasRoute = PoliciasRouteImport.update({
+  id: '/policias',
+  path: '/policias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExsapdRoute = ExsapdRouteImport.update({
+  id: '/exsapd',
+  path: '/exsapd',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AspirantesRoute = AspirantesRouteImport.update({
+  id: '/aspirantes',
+  path: '/aspirantes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AltoMandoRoute = AltoMandoRouteImport.update({
+  id: '/alto-mando',
+  path: '/alto-mando',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +61,130 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alto-mando': typeof AltoMandoRoute
+  '/aspirantes': typeof AspirantesRoute
+  '/exsapd': typeof ExsapdRoute
+  '/login': typeof LoginRoute
+  '/policias': typeof PoliciasRoute
+  '/rnap': typeof RnapRoute
+  '/salario': typeof SalarioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/alto-mando': typeof AltoMandoRoute
+  '/aspirantes': typeof AspirantesRoute
+  '/exsapd': typeof ExsapdRoute
+  '/login': typeof LoginRoute
+  '/policias': typeof PoliciasRoute
+  '/rnap': typeof RnapRoute
+  '/salario': typeof SalarioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/alto-mando': typeof AltoMandoRoute
+  '/aspirantes': typeof AspirantesRoute
+  '/exsapd': typeof ExsapdRoute
+  '/login': typeof LoginRoute
+  '/policias': typeof PoliciasRoute
+  '/rnap': typeof RnapRoute
+  '/salario': typeof SalarioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/alto-mando'
+    | '/aspirantes'
+    | '/exsapd'
+    | '/login'
+    | '/policias'
+    | '/rnap'
+    | '/salario'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/alto-mando'
+    | '/aspirantes'
+    | '/exsapd'
+    | '/login'
+    | '/policias'
+    | '/rnap'
+    | '/salario'
+  id:
+    | '__root__'
+    | '/'
+    | '/alto-mando'
+    | '/aspirantes'
+    | '/exsapd'
+    | '/login'
+    | '/policias'
+    | '/rnap'
+    | '/salario'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AltoMandoRoute: typeof AltoMandoRoute
+  AspirantesRoute: typeof AspirantesRoute
+  ExsapdRoute: typeof ExsapdRoute
+  LoginRoute: typeof LoginRoute
+  PoliciasRoute: typeof PoliciasRoute
+  RnapRoute: typeof RnapRoute
+  SalarioRoute: typeof SalarioRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/salario': {
+      id: '/salario'
+      path: '/salario'
+      fullPath: '/salario'
+      preLoaderRoute: typeof SalarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rnap': {
+      id: '/rnap'
+      path: '/rnap'
+      fullPath: '/rnap'
+      preLoaderRoute: typeof RnapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/policias': {
+      id: '/policias'
+      path: '/policias'
+      fullPath: '/policias'
+      preLoaderRoute: typeof PoliciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exsapd': {
+      id: '/exsapd'
+      path: '/exsapd'
+      fullPath: '/exsapd'
+      preLoaderRoute: typeof ExsapdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aspirantes': {
+      id: '/aspirantes'
+      path: '/aspirantes'
+      fullPath: '/aspirantes'
+      preLoaderRoute: typeof AspirantesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alto-mando': {
+      id: '/alto-mando'
+      path: '/alto-mando'
+      fullPath: '/alto-mando'
+      preLoaderRoute: typeof AltoMandoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +197,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AltoMandoRoute: AltoMandoRoute,
+  AspirantesRoute: AspirantesRoute,
+  ExsapdRoute: ExsapdRoute,
+  LoginRoute: LoginRoute,
+  PoliciasRoute: PoliciasRoute,
+  RnapRoute: RnapRoute,
+  SalarioRoute: SalarioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

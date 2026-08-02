@@ -276,6 +276,7 @@ export type Database = {
           id: string
           month_id: string
           nombre: string | null
+          nota: string | null
           paga: number
           pagado: boolean
           ultima_edicion_por: string | null
@@ -287,6 +288,7 @@ export type Database = {
           id?: string
           month_id: string
           nombre?: string | null
+          nota?: string | null
           paga?: number
           pagado?: boolean
           ultima_edicion_por?: string | null
@@ -298,6 +300,7 @@ export type Database = {
           id?: string
           month_id?: string
           nombre?: string | null
+          nota?: string | null
           paga?: number
           pagado?: boolean
           ultima_edicion_por?: string | null

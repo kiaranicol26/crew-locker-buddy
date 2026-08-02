@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Coins } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+
 import { setSession, logAction } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -161,6 +164,14 @@ export function LoginView() {
                   {loading ? "VERIFICANDO..." : "INGRESAR AL SISTEMA"}
                 </Button>
               </form>
+
+              <Button asChild variant="outline"
+                className="mt-4 h-11 w-full rounded-none border-blue-300 bg-white text-blue-800 font-bold tracking-wider hover:bg-blue-50">
+                <Link to="/salario">
+                  <Coins className="w-4 h-4 mr-2" /> VER SALARIOS (PÚBLICO)
+                </Link>
+              </Button>
+
 
               <div className="mt-8">
                 <div className="border-t border-blue-200 pt-5">

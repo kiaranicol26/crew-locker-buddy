@@ -1,0 +1,1 @@
+ALTER TABLE public.salary_entries ADD COLUMN IF NOT EXISTS nota text;

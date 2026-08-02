@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { INSTRUCTOR_BONUS, sortByRango } from "@/lib/rangos";
+import { sortByRango } from "@/lib/rangos";
 import { toast } from "sonner";
 import { Trash2, Plus, ChevronDown, ChevronRight, Coins, Users } from "lucide-react";
 
@@ -23,7 +23,7 @@ type Entry = {
   nombre: string | null;
   paga: number;
   pagado: boolean;
-  es_instructor: boolean;
+  nota: string | null;
   ultima_edicion_por: string | null;
 };
 
@@ -32,10 +32,10 @@ type PdMember = {
   nombre: string;
   rango: string | null;
   sueldo_defecto: number;
-  es_instructor: boolean;
 };
 
-export function SalarioView({ session }: { session: Session }) {
+export function SalarioView({ session }: { session: Session | null }) {
+  const canEdit = !!session?.is_alto_mando;
   const [months, setMonths] = useState<Month[]>([]);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [pd, setPd] = useState<PdMember[]>([]);
@@ -46,7 +46,7 @@ export function SalarioView({ session }: { session: Session }) {
     const [m, e, p] = await Promise.all([
       supabase.from("salary_months").select("*").order("created_at", { ascending: false }),
       supabase.from("salary_entries").select("*").order("created_at", { ascending: true }),
-      supabase.from("pd_members").select("id, nombre, rango, sueldo_defecto, es_instructor").order("nombre", { ascending: true }),
+      supabase.from("pd_members").select("id, nombre, rango, sueldo_defecto").order("nombre", { ascending: true }),
     ]);
     if (m.data) {
       setMonths(m.data as Month[]);
@@ -73,9 +73,8 @@ export function SalarioView({ session }: { session: Session }) {
         month_id: monthId,
         nombre: p.nombre,
         paga: Number(p.sueldo_defecto) || 0,
-        es_instructor: !!p.es_instructor,
         pagado: false,
-        ultima_edicion_por: session.name,
+        ultima_edicion_por: session?.name ?? null,
       })) as any,
     );
     if (error) return toast.error(error.message);
@@ -89,7 +88,7 @@ export function SalarioView({ session }: { session: Session }) {
     if (!label) return toast.error("Escribe el nombre del mes");
     const { data, error } = await supabase
       .from("salary_months")
-      .insert({ label, created_by: session.id } as any)
+      .insert({ label, created_by: session?.id ?? null } as any)
       .select("id")
       .maybeSingle();
     if (error) return toast.error(error.message);
@@ -121,9 +120,10 @@ export function SalarioView({ session }: { session: Session }) {
   }
 
   async function saveEntry(id: string, patch: Partial<Entry>) {
+    if (!canEdit) return;
     const { error } = await supabase
       .from("salary_entries")
-      .update({ ...patch, ultima_edicion_por: session.name } as any)
+      .update({ ...patch, ultima_edicion_por: session?.name ?? null } as any)
       .eq("id", id);
     if (error) toast.error(error.message);
   }
@@ -131,7 +131,7 @@ export function SalarioView({ session }: { session: Session }) {
   const fmt = (n: number) => `${Math.round(n).toLocaleString("es-ES")} Coins`;
   const rangoDe = (nombre: string | null) =>
     pd.find(p => p.nombre === nombre)?.rango ?? null;
-  const totalDe = (r: Entry) => (Number(r.paga) || 0) + (r.es_instructor ? INSTRUCTOR_BONUS : 0);
+  const totalDe = (r: Entry) => Number(r.paga) || 0;
 
   return (
     <div className="space-y-4">
@@ -152,21 +152,24 @@ export function SalarioView({ session }: { session: Session }) {
               </h2>
             </div>
           </div>
-          <form onSubmit={addMonth} className="flex flex-col sm:flex-row gap-3">
-            <Input
-              placeholder="Nombre del mes (Ej: Enero 2026)"
-              value={newMonth}
-              onChange={e => setNewMonth(e.target.value)}
-              className="h-11 rounded-none border-blue-300 bg-white font-semibold text-slate-800 focus:border-blue-700 sm:max-w-xs"
-            />
-            <Button type="submit"
-              className="h-11 rounded-none bg-blue-700 hover:bg-blue-800 text-white font-bold tracking-wider">
-              <Plus className="w-4 h-4 mr-1" /> Añadir nuevo mes
-            </Button>
-          </form>
+          {canEdit && (
+            <form onSubmit={addMonth} className="flex flex-col sm:flex-row gap-3">
+              <Input
+                placeholder="Nombre del mes (Ej: Enero 2026)"
+                value={newMonth}
+                onChange={e => setNewMonth(e.target.value)}
+                className="h-11 rounded-none border-blue-300 bg-white font-semibold text-slate-800 focus:border-blue-700 sm:max-w-xs"
+              />
+              <Button type="submit"
+                className="h-11 rounded-none bg-blue-700 hover:bg-blue-800 text-white font-bold tracking-wider">
+                <Plus className="w-4 h-4 mr-1" /> Añadir nuevo mes
+              </Button>
+            </form>
+          )}
           <p className="text-xs text-slate-500 font-semibold">
-            Los nombres se toman de la Lista PD y no se editan aquí. Los instructores reciben
-            +{INSTRUCTOR_BONUS} Coins extra.
+            {canEdit
+              ? "Los nombres se toman de la Lista PD y no se editan aquí."
+              : "Vista pública de solo lectura. Solo el Alto Mando puede editar los salarios."}
           </p>
         </div>
       </Card>
@@ -202,17 +205,19 @@ export function SalarioView({ session }: { session: Session }) {
                 </span>
                 <span className="text-xs text-slate-500 font-mono font-bold">{rows.length} agentes</span>
               </button>
-              <div className="flex items-center gap-2">
-                <Button size="sm" variant="outline"
-                  onClick={() => syncMonth(m.id, rows.map(r => r.nombre ?? ""))}
-                  className="h-9 rounded-none border-blue-300 bg-white text-blue-800 font-bold hover:bg-blue-50">
-                  <Users className="w-4 h-4 mr-1" /> Cargar Lista PD
-                </Button>
-                <Button size="icon" variant="ghost" onClick={() => removeMonth(m)}
-                  className="h-9 w-9 rounded-none hover:bg-red-100">
-                  <Trash2 className="w-4 h-4 text-red-600" />
-                </Button>
-              </div>
+              {canEdit && (
+                <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline"
+                    onClick={() => syncMonth(m.id, rows.map(r => r.nombre ?? ""))}
+                    className="h-9 rounded-none border-blue-300 bg-white text-blue-800 font-bold hover:bg-blue-50">
+                    <Users className="w-4 h-4 mr-1" /> Cargar Lista PD
+                  </Button>
+                  <Button size="icon" variant="ghost" onClick={() => removeMonth(m)}
+                    className="h-9 w-9 rounded-none hover:bg-red-100">
+                    <Trash2 className="w-4 h-4 text-red-600" />
+                  </Button>
+                </div>
+              )}
             </div>
 
             {isOpen && (
@@ -225,9 +230,9 @@ export function SalarioView({ session }: { session: Session }) {
                         <th className="p-3 text-left border border-blue-600 uppercase font-extrabold tracking-wider">Rango</th>
                         <th className="p-3 text-left border border-blue-600 uppercase font-extrabold tracking-wider">Mes</th>
                         <th className="p-3 text-left border border-blue-600 uppercase font-extrabold tracking-wider">Paga total (Coins)</th>
-                        <th className="p-3 text-center border border-blue-600 uppercase font-extrabold tracking-wider">Instructor</th>
+                        <th className="p-3 text-left border border-blue-600 uppercase font-extrabold tracking-wider">Nota</th>
                         <th className="p-3 text-center border border-blue-600 uppercase font-extrabold tracking-wider">Pagado</th>
-                        <th className="p-3 border border-blue-600 w-10" />
+                        {canEdit && <th className="p-3 border border-blue-600 w-10" />}
                       </tr>
                     </thead>
                     <tbody>
@@ -242,7 +247,7 @@ export function SalarioView({ session }: { session: Session }) {
                           </td>
                           <td className="p-3 border border-blue-200 font-semibold text-slate-600 whitespace-nowrap">{m.label}</td>
                           <td className="p-2 border border-blue-200">
-                            <div className="flex items-center gap-2">
+                            {canEdit ? (
                               <Input
                                 type="number"
                                 value={String(r.paga ?? 0)}
@@ -250,28 +255,28 @@ export function SalarioView({ session }: { session: Session }) {
                                 onBlur={e => saveEntry(r.id, { paga: Number(e.target.value) || 0 })}
                                 className="h-9 w-28 rounded-none border-blue-200 bg-white text-slate-800 font-mono font-bold"
                               />
-                              {r.es_instructor && (
-                                <span className="text-xs font-extrabold text-emerald-700 whitespace-nowrap">
-                                  +{INSTRUCTOR_BONUS} (Instructor) = {fmt(totalDe(r))}
-                                </span>
-                              )}
-                            </div>
+                            ) : (
+                              <span className="font-mono font-bold text-slate-800">{fmt(totalDe(r))}</span>
+                            )}
                           </td>
-                          <td className="p-3 text-center border border-blue-200">
-                            <div className="flex items-center justify-center gap-2">
-                              <Switch
-                                checked={r.es_instructor}
-                                onCheckedChange={v => { patchLocal(r.id, { es_instructor: v }); saveEntry(r.id, { es_instructor: v }); }}
+                          <td className="p-2 border border-blue-200">
+                            {canEdit ? (
+                              <Input
+                                placeholder="Nota:"
+                                value={r.nota ?? ""}
+                                onChange={e => patchLocal(r.id, { nota: e.target.value })}
+                                onBlur={e => saveEntry(r.id, { nota: e.target.value.trim() || null })}
+                                className="h-9 min-w-[180px] rounded-none border-blue-200 bg-white text-slate-800 font-semibold"
                               />
-                              <span className={`text-xs font-extrabold ${r.es_instructor ? "text-emerald-700" : "text-slate-400"}`}>
-                                {r.es_instructor ? "SÍ" : "NO"}
-                              </span>
-                            </div>
+                            ) : (
+                              <span className="font-semibold text-slate-600">{r.nota || "—"}</span>
+                            )}
                           </td>
                           <td className="p-3 text-center border border-blue-200">
                             <div className="flex items-center justify-center gap-2">
                               <Switch
                                 checked={r.pagado}
+                                disabled={!canEdit}
                                 onCheckedChange={v => { patchLocal(r.id, { pagado: v }); saveEntry(r.id, { pagado: v }); }}
                               />
                               <span className={`text-xs font-extrabold ${r.pagado ? "text-emerald-700" : "text-red-600"}`}>
@@ -279,17 +284,19 @@ export function SalarioView({ session }: { session: Session }) {
                               </span>
                             </div>
                           </td>
-                          <td className="p-2 text-center border border-blue-200">
-                            <Button size="icon" variant="ghost" onClick={() => removeEntry(r)}
-                              className="h-8 w-8 rounded-none hover:bg-red-100">
-                              <Trash2 className="w-4 h-4 text-red-600" />
-                            </Button>
-                          </td>
+                          {canEdit && (
+                            <td className="p-2 text-center border border-blue-200">
+                              <Button size="icon" variant="ghost" onClick={() => removeEntry(r)}
+                                className="h-8 w-8 rounded-none hover:bg-red-100">
+                                <Trash2 className="w-4 h-4 text-red-600" />
+                              </Button>
+                            </td>
+                          )}
                         </tr>
                       ))}
                       {rows.length === 0 && (
                         <tr>
-                          <td colSpan={7} className="p-8 text-center text-slate-400 uppercase tracking-widest font-bold">
+                          <td colSpan={canEdit ? 7 : 6} className="p-8 text-center text-slate-400 uppercase tracking-widest font-bold">
                             Sin agentes en este mes.
                           </td>
                         </tr>
