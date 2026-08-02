@@ -27,10 +27,12 @@ export function setSession(s: Session | null) {
   window.dispatchEvent(new Event("session-change"));
 }
 
-export function useSession() {
+export function useSessionState() {
   const [session, setSess] = useState<Session | null>(null);
+  const [ready, setReady] = useState(false);
   useEffect(() => {
     setSess(getSession());
+    setReady(true);
     const h = () => setSess(getSession());
     window.addEventListener("session-change", h);
     window.addEventListener("storage", h);
@@ -39,8 +41,13 @@ export function useSession() {
       window.removeEventListener("storage", h);
     };
   }, []);
-  return session;
+  return { session, ready };
 }
+
+export function useSession() {
+  return useSessionState().session;
+}
+
 
 export async function logAction(
   supabase: any,
