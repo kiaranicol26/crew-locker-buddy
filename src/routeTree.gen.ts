@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SalarioRouteImport } from './routes/salario'
 import { Route as RnapRouteImport } from './routes/rnap'
 import { Route as PoliciasRouteImport } from './routes/policias'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ExsapdRouteImport } from './routes/exsapd'
 import { Route as AspirantesRouteImport } from './routes/aspirantes'
 import { Route as AltoMandoRouteImport } from './routes/alto-mando'
@@ -30,6 +31,11 @@ const RnapRoute = RnapRouteImport.update({
 const PoliciasRoute = PoliciasRouteImport.update({
   id: '/policias',
   path: '/policias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExsapdRoute = ExsapdRouteImport.update({
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/alto-mando': typeof AltoMandoRoute
   '/aspirantes': typeof AspirantesRoute
   '/exsapd': typeof ExsapdRoute
+  '/login': typeof LoginRoute
   '/policias': typeof PoliciasRoute
   '/rnap': typeof RnapRoute
   '/salario': typeof SalarioRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/alto-mando': typeof AltoMandoRoute
   '/aspirantes': typeof AspirantesRoute
   '/exsapd': typeof ExsapdRoute
+  '/login': typeof LoginRoute
   '/policias': typeof PoliciasRoute
   '/rnap': typeof RnapRoute
   '/salario': typeof SalarioRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/alto-mando': typeof AltoMandoRoute
   '/aspirantes': typeof AspirantesRoute
   '/exsapd': typeof ExsapdRoute
+  '/login': typeof LoginRoute
   '/policias': typeof PoliciasRoute
   '/rnap': typeof RnapRoute
   '/salario': typeof SalarioRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/alto-mando'
     | '/aspirantes'
     | '/exsapd'
+    | '/login'
     | '/policias'
     | '/rnap'
     | '/salario'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/alto-mando'
     | '/aspirantes'
     | '/exsapd'
+    | '/login'
     | '/policias'
     | '/rnap'
     | '/salario'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/alto-mando'
     | '/aspirantes'
     | '/exsapd'
+    | '/login'
     | '/policias'
     | '/rnap'
     | '/salario'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   AltoMandoRoute: typeof AltoMandoRoute
   AspirantesRoute: typeof AspirantesRoute
   ExsapdRoute: typeof ExsapdRoute
+  LoginRoute: typeof LoginRoute
   PoliciasRoute: typeof PoliciasRoute
   RnapRoute: typeof RnapRoute
   SalarioRoute: typeof SalarioRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/policias'
       fullPath: '/policias'
       preLoaderRoute: typeof PoliciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/exsapd': {
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   AltoMandoRoute: AltoMandoRoute,
   AspirantesRoute: AspirantesRoute,
   ExsapdRoute: ExsapdRoute,
+  LoginRoute: LoginRoute,
   PoliciasRoute: PoliciasRoute,
   RnapRoute: RnapRoute,
   SalarioRoute: SalarioRoute,
