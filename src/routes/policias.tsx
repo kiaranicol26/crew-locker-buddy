@@ -1,0 +1,15 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Protected } from "@/components/Protected";
+import { ListaPdView } from "@/components/ListaPdView";
+
+export const Route = createFileRoute("/policias")({
+  head: () => ({
+    meta: [
+      { title: "Lista PD · mySAPD" },
+      { name: "description", content: "Lista de agentes activos del San Andreas Police Department." },
+      { property: "og:title", content: "Lista PD · mySAPD" },
+      { property: "og:description", content: "Lista de agentes activos del San Andreas Police Department." },
+    ],
+  }),
+  component: () => <Protected>{s => <ListaPdView session={s} />}</Protected>,
+});
