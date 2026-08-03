@@ -17,6 +17,20 @@ export function setToken(token: string | null) {
   else localStorage.removeItem(TOKEN_KEY);
 }
 
+/**
+ * The signed session token is missing or expired: clear the stale local session
+ * so the app sends the user back to the login screen instead of failing silently.
+ */
+function handleUnauthorized() {
+  if (typeof window === "undefined") return;
+  const hadSession = localStorage.getItem("instructor_session");
+  if (!hadSession) return;
+  localStorage.removeItem("instructor_session");
+  localStorage.removeItem(TOKEN_KEY);
+  window.dispatchEvent(new Event("session-change"));
+}
+
+
 type Result<T = any> = { data: T; error: { message: string } | null };
 
 type Spec = {
