@@ -273,16 +273,23 @@ export function SalarioView({ session }: { session: Session | null }) {
                             )}
                           </td>
                           <td className="p-3 text-center border border-blue-200">
-                            <div className="flex items-center justify-center gap-2">
-                              <Switch
-                                checked={r.pagado}
-                                disabled={!canEdit}
-                                onCheckedChange={v => { patchLocal(r.id, { pagado: v }); saveEntry(r.id, { pagado: v }); }}
-                              />
-                              <span className={`text-xs font-extrabold ${r.pagado ? "text-emerald-700" : "text-red-600"}`}>
-                                {r.pagado ? "SÍ" : "NO"}
-                              </span>
-                            </div>
+                            <button
+                              type="button"
+                              disabled={!canEdit}
+                              onClick={() => {
+                                if (!canEdit) return;
+                                const v = !r.pagado;
+                                patchLocal(r.id, { pagado: v });
+                                saveEntry(r.id, { pagado: v });
+                              }}
+                              className={`px-3 py-1.5 text-xs font-extrabold uppercase tracking-wider border transition-colors ${
+                                r.pagado
+                                  ? "text-emerald-700 border-emerald-300 bg-emerald-50 hover:bg-emerald-100"
+                                  : "text-red-600 border-red-300 bg-red-50 hover:bg-red-100"
+                              } ${canEdit ? "cursor-pointer" : "cursor-default opacity-90"}`}
+                            >
+                              {r.pagado ? "Pagado" : "No Pagado"}
+                            </button>
                           </td>
                           {canEdit && (
                             <td className="p-2 text-center border border-blue-200">
