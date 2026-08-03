@@ -211,7 +211,7 @@ export function RecordsTable({
 
     await logAction(
 
-      supabase,
+      db,
 
       session,
 
@@ -355,7 +355,7 @@ export function RecordsTable({
 
     await logAction(
 
-      supabase,
+      db,
 
       session,
 
@@ -468,7 +468,7 @@ export function RecordsTable({
 
     await logAction(
 
-      supabase,
+      db,
 
       session,
 
@@ -601,7 +601,7 @@ export function RecordsTable({
 
     await logAction(
 
-      supabase,
+      db,
 
       session,
 

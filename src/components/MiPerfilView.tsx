@@ -17,7 +17,7 @@ export function MiPerfilView({ session }: { session: Session }) {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    supabase
+    db
       .from("instructors")
       .select("name, avatar_url, descripcion")
       .eq("id", session.id)
