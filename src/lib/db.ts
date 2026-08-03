@@ -17,6 +17,20 @@ export function setToken(token: string | null) {
   else localStorage.removeItem(TOKEN_KEY);
 }
 
+/**
+ * The signed session token is missing or expired: clear the stale local session
+ * so the app sends the user back to the login screen instead of failing silently.
+ */
+function handleUnauthorized() {
+  if (typeof window === "undefined") return;
+  const hadSession = localStorage.getItem("instructor_session");
+  if (!hadSession) return;
+  localStorage.removeItem("instructor_session");
+  localStorage.removeItem(TOKEN_KEY);
+  window.dispatchEvent(new Event("session-change"));
+}
+
+
 type Result<T = any> = { data: T; error: { message: string } | null };
 
 type Spec = {
@@ -77,11 +91,13 @@ class Builder implements PromiseLike<Result> {
   private async exec(): Promise<Result> {
     try {
       const res = (await dbQuery({ data: { ...this.spec, token: getToken() } })) as Result;
+      if (res?.error?.message === "No autorizado") handleUnauthorized();
       return res;
     } catch (e) {
       return { data: null, error: { message: (e as Error).message || "Error de red" } };
     }
   }
+
 
   then<TR1 = Result, TR2 = never>(
     onfulfilled?: ((value: Result) => TR1 | PromiseLike<TR1>) | null,
