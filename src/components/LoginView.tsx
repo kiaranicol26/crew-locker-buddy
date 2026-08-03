@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Coins } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 import { setSession, logAction } from "@/lib/session";
+import { getBackground } from "@/lib/appearance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -13,6 +14,14 @@ import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 export function LoginView() {
   const [id, setId] = useState("");
   const [loading, setLoading] = useState(false);
+  const [bg, setBg] = useState("");
+
+  useEffect(() => {
+    const load = () => getBackground().then(setBg).catch(() => {});
+    load();
+    window.addEventListener("background-change", load);
+    return () => window.removeEventListener("background-change", load);
+  }, []);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -23,7 +32,7 @@ export function LoginView() {
 
     const { data, error } = await supabase
       .from("instructors")
-      .select("id, name, is_alto_mando, can_delete, can_emit_rnap")
+      .select("id, name, is_alto_mando, can_delete, can_emit_rnap, avatar_url, descripcion")
       .eq("id", id.trim())
       .maybeSingle();
 
@@ -40,6 +49,8 @@ export function LoginView() {
       is_alto_mando: data.is_alto_mando,
       can_delete: data.is_alto_mando || !!data.can_delete,
       can_emit_rnap: data.is_alto_mando || !!data.can_emit_rnap,
+      avatar_url: (data as any).avatar_url ?? null,
+      descripcion: (data as any).descripcion ?? null,
     };
 
     setSession(sess);
@@ -52,12 +63,16 @@ export function LoginView() {
   }
 
   return (
-    <div className="relative min-h-screen bg-slate-100">
+    <div
+      className="relative min-h-screen bg-slate-100 bg-center bg-cover bg-fixed"
+      style={bg ? { backgroundImage: `url(${bg})` } : undefined}
+    >
+      {bg && <div className="absolute inset-0 bg-slate-900/40" />}
       <div className="relative flex min-h-screen items-center justify-center p-6">
         <div className="w-full max-w-2xl">
           <div className="bg-white border border-blue-200 border-b-0 px-3 py-2 flex items-center gap-2">
             <div className="flex-1 bg-slate-50 border border-blue-200 px-3 py-1 text-xs text-slate-500 font-mono truncate">
-              www.sapd.gov/instructor-login
+              www.mysapd.gov/login
             </div>
             <div className="flex gap-1">
               <span className="w-6 h-6 bg-slate-100 border border-blue-200 flex items-center justify-center text-slate-500 text-xs">◀</span>
@@ -75,10 +90,10 @@ export function LoginView() {
                 </div>
                 <div>
                   <h1 className="text-blue-700 font-display font-extrabold text-3xl tracking-wider">
-                    SAPD
+                    mySAPD
                   </h1>
                   <p className="text-slate-500 text-[10px] tracking-[0.3em] uppercase mt-1">
-                    Instructor Profile Database
+                    Police Management Database
                   </p>
                 </div>
               </div>
@@ -108,12 +123,12 @@ export function LoginView() {
                 <h2 className="text-blue-600 text-xs tracking-[0.35em] uppercase font-semibold">
                   San Andreas State
                 </h2>
-                <h1 className="mt-2 text-3xl font-extrabold uppercase tracking-wide text-slate-900 font-display">
-                  Police Department
+                <h1 className="mt-2 text-4xl font-black uppercase tracking-wide text-slate-900 font-display">
+                  my<span className="text-blue-700">SAPD</span>
                 </h1>
                 <div className="mx-auto mt-5 mb-5 h-px w-32 bg-blue-600"></div>
-                <p className="text-slate-500 text-sm tracking-wider">
-                  Instructor Management System
+                <p className="text-slate-600 text-sm font-bold tracking-wide">
+                  Web de Gestión de la Policía de San Andreas
                 </p>
               </div>
 
@@ -122,7 +137,7 @@ export function LoginView() {
                 className="mt-8 space-y-5"
               >
                 <Input
-                  placeholder="Ingrese su ID de Instructor"
+                  placeholder="Ingrese su ID de acceso"
                   value={id}
                   onChange={(e) => setId(e.target.value)}
                   autoFocus
@@ -175,13 +190,13 @@ export function LoginView() {
 
               <div className="mt-8">
                 <div className="border-t border-blue-200 pt-5">
-                  <p className="text-center text-xs uppercase tracking-[0.25em] text-slate-500">
-                    Web Management System
+                  <p className="text-center text-xs uppercase tracking-[0.25em] text-slate-500 font-extrabold">
+                    Gestión de mySAPD
                   </p>
-                  <p className="mt-2 text-center text-[11px] text-slate-400">
-                    Acceso exclusivo para personal autorizado.
+                  <p className="mt-2 text-center text-[11px] text-slate-400 font-bold">
+                    WestZone Roleplay
                   </p>
-                  <p className="mt-1 text-center text-[10px] text-slate-400">
+                  <p className="mt-1 text-center text-[10px] text-slate-400 font-bold">
                     SAN ANDREAS POLICE DEPARTMENT © 2026
                   </p>
                 </div>
