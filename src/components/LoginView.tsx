@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Coins } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 
 import { setSession, logAction } from "@/lib/session";
 import { getBackground } from "@/lib/appearance";
@@ -30,7 +30,7 @@ export function LoginView() {
 
     setLoading(true);
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("instructors")
       .select("id, name, is_alto_mando, can_delete, can_emit_rnap, avatar_url, descripcion")
       .eq("id", id.trim())
@@ -55,7 +55,7 @@ export function LoginView() {
 
     setSession(sess);
 
-    await logAction(supabase, sess, "LOGIN", {
+    await logAction(db, sess, "LOGIN", {
       id: sess.id,
     });
 

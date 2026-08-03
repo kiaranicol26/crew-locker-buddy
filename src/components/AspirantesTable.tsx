@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 import { Session, logAction } from "@/lib/session";
 import { notifyDiscord } from "@/lib/discord";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ export function AspirantesTable({ session }: { session: Session }) {
   const canDelete = session.is_alto_mando || session.can_delete;
 
   async function load() {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("aspirantes").select("*").order("created_at", { ascending: true });
     if (error) toast.error(error.message);
     else setRows((data ?? []) as AspiranteRow[]);
@@ -30,13 +30,13 @@ export function AspirantesTable({ session }: { session: Session }) {
   useEffect(() => { load(); }, []);
 
   async function addRow() {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("aspirantes")
       .insert({ updated_by: session.id, ultima_edicion_por: session.name } as any)
       .select().single();
     if (error) return toast.error(error.message);
     setRows(r => [...r, data as AspiranteRow]);
-    await logAction(supabase, session, "CREATE_ASPIRANTE", { id: data.id });
+    await logAction(db, session, "CREATE_ASPIRANTE", { id: data.id });
     await notifyDiscord({
       policiaId: session.id, policiaName: session.name,
       action: "Creado", section: "Aspirante", targetName: "(nuevo aspirante)",
@@ -47,10 +47,10 @@ export function AspirantesTable({ session }: { session: Session }) {
   async function deleteRow(row: AspiranteRow) {
     if (!canDelete) { toast.error("No tenés permiso para borrar agentes"); return; }
     if (!confirm(`¿Eliminar aspirante ${row.nombre || ""}?`)) return;
-    const { error } = await supabase.from("aspirantes").delete().eq("id", row.id);
+    const { error } = await db.from("aspirantes").delete().eq("id", row.id);
     if (error) return toast.error(error.message);
     setRows(rs => rs.filter(r => r.id !== row.id));
-    await logAction(supabase, session, "DELETE_ASPIRANTE", { id: row.id });
+    await logAction(db, session, "DELETE_ASPIRANTE", { id: row.id });
     await notifyDiscord({
       policiaId: session.id, policiaName: session.name,
       action: "Borrado", section: "Aspirante",
@@ -61,22 +61,22 @@ export function AspirantesTable({ session }: { session: Session }) {
   async function clearAll() {
     if (!isComisario) return;
     if (!confirm("¿VACIAR TODA la tabla de Aspirantes?")) return;
-    const { error } = await supabase.from("aspirantes").delete()
+    const { error } = await db.from("aspirantes").delete()
       .neq("id", "00000000-0000-0000-0000-000000000000");
     if (error) return toast.error(error.message);
     setRows([]);
-    await logAction(supabase, session, "CLEAR_ASPIRANTES", {});
+    await logAction(db, session, "CLEAR_ASPIRANTES", {});
   }
 
   async function updatePasa(row: AspiranteRow, v: string) {
     const prev = row.pasa;
     if (prev === v) return;
     setRows(rs => rs.map(r => r.id === row.id ? { ...r, pasa: v, ultima_edicion_por: session.name } : r));
-    const { error } = await supabase.from("aspirantes").update({
+    const { error } = await db.from("aspirantes").update({
       pasa: v, updated_by: session.id, ultima_edicion_por: session.name,
     }).eq("id", row.id);
     if (error) return toast.error(error.message);
-    await logAction(supabase, session, "UPDATE_ASPIRANTE", { id: row.id, field: "pasa", from: prev, to: v });
+    await logAction(db, session, "UPDATE_ASPIRANTE", { id: row.id, field: "pasa", from: prev, to: v });
     await notifyDiscord({
       policiaId: session.id, policiaName: session.name,
       action: "Editado", section: "Aspirante",

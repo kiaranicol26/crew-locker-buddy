@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 import { Session, logAction } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,8 +55,8 @@ export function AltoMando({ session }: { session: Session }) {
 
   async function loadAll() {
     const [i, l] = await Promise.all([
-      supabase.from("instructors").select("*").order("created_at", { ascending: true }),
-      supabase.from("logs").select("*").order("created_at", { ascending: false }).limit(200),
+      db.from("instructors").select("*").order("created_at", { ascending: true }),
+      db.from("logs").select("*").order("created_at", { ascending: false }).limit(200),
     ]);
     if (i.data) setInstructors(i.data as Instructor[]);
     if (l.data) setLogs(l.data as Log[]);
@@ -74,7 +74,7 @@ export function AltoMando({ session }: { session: Session }) {
     try {
       await setBackground(value);
       setBg(value);
-      await logAction(supabase, session, "UPDATE_BACKGROUND", { value: value ? "(set)" : "(cleared)" });
+      await logAction(db, session, "UPDATE_BACKGROUND", { value: value ? "(set)" : "(cleared)" });
       toast.success(value ? "Fondo actualizado" : "Fondo restaurado");
     } catch (e: any) { toast.error(e.message ?? "Error"); }
     finally { setSavingBg(false); }
@@ -93,7 +93,7 @@ export function AltoMando({ session }: { session: Session }) {
     setSavingHook(true);
     try {
       await setWebhookUrl(webhook);
-      await logAction(supabase, session, "UPDATE_WEBHOOK", { url: webhook ? "(set)" : "(cleared)" });
+      await logAction(db, session, "UPDATE_WEBHOOK", { url: webhook ? "(set)" : "(cleared)" });
       toast.success("Webhook guardado");
     } catch (e: any) { toast.error(e.message ?? "Error"); }
     finally { setSavingHook(false); }
@@ -103,7 +103,7 @@ export function AltoMando({ session }: { session: Session }) {
     setSavingRnap(true);
     try {
       await setRnapWebhookUrl(rnapHook);
-      await logAction(supabase, session, "UPDATE_RNAP_WEBHOOK", { url: rnapHook ? "(set)" : "(cleared)" });
+      await logAction(db, session, "UPDATE_RNAP_WEBHOOK", { url: rnapHook ? "(set)" : "(cleared)" });
       toast.success("Webhook de RNAP guardado");
     } catch (e: any) { toast.error(e.message ?? "Error"); }
     finally { setSavingRnap(false); }
@@ -115,7 +115,7 @@ export function AltoMando({ session }: { session: Session }) {
     const name = newName.trim();
     if (!id || !name) return toast.error("ID y nombre requeridos");
     const isAlto = newRole === "Comisario";
-    const { error } = await supabase.from("instructors").insert({
+    const { error } = await db.from("instructors").insert({
       id, name,
       is_alto_mando: isAlto,
       role: newRole,
@@ -124,7 +124,7 @@ export function AltoMando({ session }: { session: Session }) {
       created_by: session.id,
     } as any);
     if (error) return toast.error(error.message);
-    await logAction(supabase, session, "CREATE_ID", { id, name, role: newRole });
+    await logAction(db, session, "CREATE_ID", { id, name, role: newRole });
     toast.success(`ID ${id} (${name}) creado como ${newRole}`);
     setNewId(""); setNewName(""); setNewRole("Instructor");
     loadAll();
@@ -133,18 +133,18 @@ export function AltoMando({ session }: { session: Session }) {
   async function removeInstructor(id: string, name: string) {
     if (id === session.id) return toast.error("No puedes eliminarte a ti mismo");
     if (!confirm(`¿Eliminar ID ${id} (${name})?`)) return;
-    const { error } = await supabase.from("instructors").delete().eq("id", id);
+    const { error } = await db.from("instructors").delete().eq("id", id);
     if (error) return toast.error(error.message);
-    await logAction(supabase, session, "DELETE_ID", { id, name });
+    await logAction(db, session, "DELETE_ID", { id, name });
     loadAll();
   }
 
   async function togglePerm(i: Instructor, field: "can_delete" | "can_emit_rnap", value: boolean) {
     if (i.is_alto_mando) { toast.info("Los Comisarios tienen todos los permisos"); return; }
     setInstructors(prev => prev.map(x => x.id === i.id ? { ...x, [field]: value } : x));
-    const { error } = await supabase.from("instructors").update({ [field]: value } as any).eq("id", i.id);
+    const { error } = await db.from("instructors").update({ [field]: value } as any).eq("id", i.id);
     if (error) { toast.error(error.message); loadAll(); return; }
-    await logAction(supabase, session, "UPDATE_PERM", { id: i.id, name: i.name, field, value });
+    await logAction(db, session, "UPDATE_PERM", { id: i.id, name: i.name, field, value });
   }
 
   return (

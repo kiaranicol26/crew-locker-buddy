@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 import { logAction, setSession, type Session } from "@/lib/session";
 import { getBackground } from "@/lib/appearance";
 import { LogOut, Shield, LogIn, UserRound } from "lucide-react";
@@ -35,7 +35,7 @@ export function AppShell({
   }, []);
 
   async function handleLogout() {
-    await logAction(supabase, session, "LOGOUT");
+    await logAction(db, session, "LOGOUT");
     setSession(null);
     navigate({ to: "/login" });
   }
