@@ -77,11 +77,13 @@ class Builder implements PromiseLike<Result> {
   private async exec(): Promise<Result> {
     try {
       const res = (await dbQuery({ data: { ...this.spec, token: getToken() } })) as Result;
+      if (res?.error?.message === "No autorizado") handleUnauthorized();
       return res;
     } catch (e) {
       return { data: null, error: { message: (e as Error).message || "Error de red" } };
     }
   }
+
 
   then<TR1 = Result, TR2 = never>(
     onfulfilled?: ((value: Result) => TR1 | PromiseLike<TR1>) | null,
