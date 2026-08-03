@@ -79,30 +79,36 @@ export type Database = {
       }
       instructors: {
         Row: {
+          avatar_url: string | null
           can_delete: boolean
           can_emit_rnap: boolean
           created_at: string
           created_by: string | null
+          descripcion: string | null
           id: string
           is_alto_mando: boolean
           name: string
           role: string
         }
         Insert: {
+          avatar_url?: string | null
           can_delete?: boolean
           can_emit_rnap?: boolean
           created_at?: string
           created_by?: string | null
+          descripcion?: string | null
           id: string
           is_alto_mando?: boolean
           name: string
           role?: string
         }
         Update: {
+          avatar_url?: string | null
           can_delete?: boolean
           can_emit_rnap?: boolean
           created_at?: string
           created_by?: string | null
+          descripcion?: string | null
           id?: string
           is_alto_mando?: boolean
           name?: string

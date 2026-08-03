@@ -6,6 +6,8 @@ export type Session = {
   is_alto_mando: boolean;
   can_delete: boolean;
   can_emit_rnap: boolean;
+  avatar_url?: string | null;
+  descripcion?: string | null;
 };
 
 const KEY = "instructor_session";
