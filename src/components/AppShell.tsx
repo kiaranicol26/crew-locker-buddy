@@ -76,15 +76,22 @@ export function AppShell({
                     )}
                   </>
                 ) : (
-                  "Vista pública · solo lectura"
+                  "Invitado · solo lectura"
                 )}
               </p>
             </div>
 
             <div className="absolute top-3 right-4 lg:right-6 flex items-center gap-2">
               <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-blue-600 text-white border border-blue-700">
-                <span className="text-[11px] font-mono font-bold">K-105WZRP</span>
-                <span className="text-[9px] uppercase tracking-wider opacity-90">Alto Mando</span>
+                {session?.avatar_url ? (
+                  <img src={session.avatar_url} alt={session.name}
+                    className="w-6 h-6 object-cover border border-blue-200" />
+                ) : (
+                  <span className="w-6 h-6 flex items-center justify-center border border-blue-200 bg-blue-500">
+                    <UserRound className="w-3.5 h-3.5" />
+                  </span>
+                )}
+                <span className="text-[11px] font-bold">{session ? session.name : "Invitado"}</span>
               </div>
               {session ? (
                 <Button variant="outline" size="sm" onClick={handleLogout}
@@ -99,6 +106,7 @@ export function AppShell({
               )}
             </div>
           </div>
+
 
           <nav className="w-full px-4 lg:px-6">
             <div className="flex items-stretch gap-0 border-t-2 border-blue-600">
