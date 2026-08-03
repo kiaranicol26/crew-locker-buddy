@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 import { Session, logAction } from "@/lib/session";
 import { notifyDiscord } from "@/lib/discord";
 import { Button } from "@/components/ui/button";
@@ -74,10 +74,10 @@ export function EditRecordDialog({
       ultima_edicion_por: session.name,
     };
 
-    const { error } = await supabase.from("records").update(patch).eq("id", form.id);
+    const { error } = await db.from("records").update(patch).eq("id", form.id);
     if (error) return toast.error(error.message);
 
-    await logAction(supabase, session, "UPDATE_RECORD", { id: form.id, changes });
+    await logAction(db, session, "UPDATE_RECORD", { id: form.id, changes });
     await notifyDiscord({
       policiaId: session.id,
       policiaName: session.name,

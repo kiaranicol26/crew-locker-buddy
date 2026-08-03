@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 
 const CHANGES_KEY = "discord_webhook_url";
 const RNAP_KEY = "discord_rnap_webhook_url";
@@ -9,7 +9,7 @@ async function getKey(key: string, force = false): Promise<string> {
   const now = Date.now();
   const c = cache[key];
   if (!force && c && now - c.at < 30_000) return c.value;
-  const { data } = await supabase
+  const { data } = await db
     .from("app_settings").select("value").eq("key", key).maybeSingle();
   const value = (data?.value ?? "").trim();
   cache[key] = { value, at: now };
@@ -18,7 +18,7 @@ async function getKey(key: string, force = false): Promise<string> {
 
 async function setKey(key: string, url: string) {
   cache[key] = { value: url.trim(), at: Date.now() };
-  const { error } = await supabase
+  const { error } = await db
     .from("app_settings")
     .upsert({ key, value: url.trim(), updated_at: new Date().toISOString() });
   if (error) throw error;

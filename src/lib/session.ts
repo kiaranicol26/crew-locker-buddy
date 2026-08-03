@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { db, setToken } from "@/lib/db";
 
 export type Session = {
   id: string;
@@ -25,7 +26,10 @@ export function getSession(): Session | null {
 export function setSession(s: Session | null) {
   if (typeof window === "undefined") return;
   if (s) localStorage.setItem(KEY, JSON.stringify(s));
-  else localStorage.removeItem(KEY);
+  else {
+    localStorage.removeItem(KEY);
+    setToken(null);
+  }
   window.dispatchEvent(new Event("session-change"));
 }
 
@@ -52,13 +56,13 @@ export function useSession() {
 
 
 export async function logAction(
-  supabase: any,
+  _client: unknown,
   session: Session | null,
   action: string,
   details?: Record<string, unknown>,
 ) {
   try {
-    await supabase.from("logs").insert({
+    await db.from("logs").insert({
       instructor_id: session?.id ?? null,
       instructor_name: session?.name ?? null,
       action,

@@ -1,9 +1,9 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 
 const BG_KEY = "site_background_url";
 
 export async function getBackground(): Promise<string> {
-  const { data } = await supabase
+  const { data } = await db
     .from("app_settings")
     .select("value")
     .eq("key", BG_KEY)
@@ -12,7 +12,7 @@ export async function getBackground(): Promise<string> {
 }
 
 export async function setBackground(value: string) {
-  const { error } = await supabase.from("app_settings").upsert({
+  const { error } = await db.from("app_settings").upsert({
     key: BG_KEY,
     value: value.trim(),
     updated_at: new Date().toISOString(),

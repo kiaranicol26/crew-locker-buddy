@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 import { Session, logAction } from "@/lib/session";
 import { notifyDiscord } from "@/lib/discord";
 
@@ -104,7 +104,7 @@ export function RecordsTable({
     const {
       data,
       error
-    } = await supabase
+    } = await db
 
       .from("records")
 
@@ -163,7 +163,7 @@ export function RecordsTable({
     const {
       data,
       error
-    } = await supabase
+    } = await db
 
       .from("records")
 
@@ -211,7 +211,7 @@ export function RecordsTable({
 
     await logAction(
 
-      supabase,
+      db,
 
       session,
 
@@ -312,7 +312,7 @@ export function RecordsTable({
 
     const {
       error
-    } = await supabase
+    } = await db
 
       .from("records")
 
@@ -355,7 +355,7 @@ export function RecordsTable({
 
     await logAction(
 
-      supabase,
+      db,
 
       session,
 
@@ -433,7 +433,7 @@ export function RecordsTable({
 
     const {
       error
-    } = await supabase
+    } = await db
 
       .from("records")
 
@@ -468,7 +468,7 @@ export function RecordsTable({
 
     await logAction(
 
-      supabase,
+      db,
 
       session,
 
@@ -556,7 +556,7 @@ export function RecordsTable({
 
     const {
       error
-    } = await supabase
+    } = await db
 
       .from("records")
 
@@ -601,7 +601,7 @@ export function RecordsTable({
 
     await logAction(
 
-      supabase,
+      db,
 
       session,
 

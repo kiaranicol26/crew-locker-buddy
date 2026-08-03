@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 import { Session, logAction } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,9 +44,9 @@ export function SalarioView({ session }: { session: Session | null }) {
 
   async function loadAll() {
     const [m, e, p] = await Promise.all([
-      supabase.from("salary_months").select("*").order("created_at", { ascending: false }),
-      supabase.from("salary_entries").select("*").order("created_at", { ascending: true }),
-      supabase.from("pd_members").select("id, nombre, rango, sueldo_defecto").order("nombre", { ascending: true }),
+      db.from("salary_months").select("*").order("created_at", { ascending: false }),
+      db.from("salary_entries").select("*").order("created_at", { ascending: true }),
+      db.from("pd_members").select("id, nombre, rango, sueldo_defecto").order("nombre", { ascending: true }),
     ]);
     if (m.data) {
       setMonths(m.data as Month[]);
@@ -68,7 +68,7 @@ export function SalarioView({ session }: { session: Session | null }) {
       if (!silent) toast.info("La tabla ya tiene a toda la Lista PD");
       return;
     }
-    const { error } = await supabase.from("salary_entries").insert(
+    const { error } = await db.from("salary_entries").insert(
       missing.map(p => ({
         month_id: monthId,
         nombre: p.nombre,
@@ -86,13 +86,13 @@ export function SalarioView({ session }: { session: Session | null }) {
     ev.preventDefault();
     const label = newMonth.trim();
     if (!label) return toast.error("Escribe el nombre del mes");
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("salary_months")
       .insert({ label, created_by: session?.id ?? null } as any)
       .select("id")
       .maybeSingle();
     if (error) return toast.error(error.message);
-    await logAction(supabase, session, "CREATE_SALARY_MONTH", { label });
+    await logAction(db, session, "CREATE_SALARY_MONTH", { label });
     if (data?.id) await syncMonth(data.id as string, [], true);
     setNewMonth("");
     toast.success(`Mes "${label}" creado con la Lista PD`);
@@ -101,17 +101,17 @@ export function SalarioView({ session }: { session: Session | null }) {
 
   async function removeMonth(m: Month) {
     if (!confirm(`¿Eliminar la tabla de "${m.label}" y todos sus registros?`)) return;
-    const { error } = await supabase.from("salary_months").delete().eq("id", m.id);
+    const { error } = await db.from("salary_months").delete().eq("id", m.id);
     if (error) return toast.error(error.message);
-    await logAction(supabase, session, "DELETE_SALARY_MONTH", { label: m.label });
+    await logAction(db, session, "DELETE_SALARY_MONTH", { label: m.label });
     loadAll();
   }
 
   async function removeEntry(en: Entry) {
     if (!confirm("¿Eliminar esta fila?")) return;
-    const { error } = await supabase.from("salary_entries").delete().eq("id", en.id);
+    const { error } = await db.from("salary_entries").delete().eq("id", en.id);
     if (error) return toast.error(error.message);
-    await logAction(supabase, session, "DELETE_SALARY_ENTRY", { nombre: en.nombre });
+    await logAction(db, session, "DELETE_SALARY_ENTRY", { nombre: en.nombre });
     loadAll();
   }
 
@@ -121,7 +121,7 @@ export function SalarioView({ session }: { session: Session | null }) {
 
   async function saveEntry(id: string, patch: Partial<Entry>) {
     if (!canEdit) return;
-    const { error } = await supabase
+    const { error } = await db
       .from("salary_entries")
       .update({ ...patch, ultima_edicion_por: session?.name ?? null } as any)
       .eq("id", id);

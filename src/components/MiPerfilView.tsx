@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 import { setSession, logAction, type Session } from "@/lib/session";
 import { fileToCompressedDataUrl } from "@/lib/appearance";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ export function MiPerfilView({ session }: { session: Session }) {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    supabase
+    db
       .from("instructors")
       .select("name, avatar_url, descripcion")
       .eq("id", session.id)
@@ -45,7 +45,7 @@ export function MiPerfilView({ session }: { session: Session }) {
       return;
     }
     setSaving(true);
-    const { error } = await supabase
+    const { error } = await db
       .from("instructors")
       .update({ name: name.trim(), avatar_url: avatar.trim() || null, descripcion: descripcion.trim() || null } as any)
       .eq("id", session.id);
@@ -55,7 +55,7 @@ export function MiPerfilView({ session }: { session: Session }) {
       return;
     }
     setSession({ ...session, name: name.trim(), avatar_url: avatar.trim() || null, descripcion: descripcion.trim() || null });
-    await logAction(supabase, session, "PERFIL_ACTUALIZADO", { id: session.id });
+    await logAction(db, session, "PERFIL_ACTUALIZADO", { id: session.id });
     toast.success("Perfil actualizado");
   }
 

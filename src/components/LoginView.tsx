@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Coins } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db, setToken } from "@/lib/db";
+import { loginWithId } from "@/lib/data.functions";
+
 
 import { setSession, logAction } from "@/lib/session";
 import { getBackground } from "@/lib/appearance";
@@ -30,36 +32,22 @@ export function LoginView() {
 
     setLoading(true);
 
-    const { data, error } = await supabase
-      .from("instructors")
-      .select("id, name, is_alto_mando, can_delete, can_emit_rnap, avatar_url, descripcion")
-      .eq("id", id.trim())
-      .maybeSingle();
+    const res = await loginWithId({ data: { id: id.trim() } });
 
     setLoading(false);
 
-    if (error || !data) {
+    if (!res.ok) {
       toast.error("ID no encontrado");
       return;
     }
 
-    const sess = {
-      id: data.id,
-      name: data.name,
-      is_alto_mando: data.is_alto_mando,
-      can_delete: data.is_alto_mando || !!data.can_delete,
-      can_emit_rnap: data.is_alto_mando || !!data.can_emit_rnap,
-      avatar_url: (data as any).avatar_url ?? null,
-      descripcion: (data as any).descripcion ?? null,
-    };
+    setToken(res.token);
+    setSession(res.session);
 
-    setSession(sess);
+    await logAction(db, res.session, "LOGIN", { id: res.session.id });
 
-    await logAction(supabase, sess, "LOGIN", {
-      id: sess.id,
-    });
+    toast.success(`Bienvenido, ${res.session.name}`);
 
-    toast.success(`Bienvenido, ${data.name}`);
   }
 
   return (

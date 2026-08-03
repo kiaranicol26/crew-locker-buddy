@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 import { Session, logAction } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,7 +46,7 @@ export function RnapView({ session }: { session: Session }) {
   const canDelete = session.is_alto_mando || session.can_delete;
 
   async function load() {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("rnap_certificates").select("*").order("created_at", { ascending: false });
     if (error) toast.error(error.message);
     else setCerts((data ?? []) as Cert[]);
@@ -73,14 +73,14 @@ export function RnapView({ session }: { session: Session }) {
     if (!d.nombre_completo.trim()) { toast.error("El nombre completo es obligatorio"); return; }
     const payload = { ...d, created_by: session.id };
     if ("id" in d && d.id) {
-      const { error } = await supabase.from("rnap_certificates").update(payload).eq("id", d.id);
+      const { error } = await db.from("rnap_certificates").update(payload).eq("id", d.id);
       if (error) return toast.error(error.message);
-      await logAction(supabase, session, "UPDATE_RNAP", { name: d.nombre_completo });
+      await logAction(db, session, "UPDATE_RNAP", { name: d.nombre_completo });
       toast.success("RNAP actualizado");
     } else {
-      const { error } = await supabase.from("rnap_certificates").insert(payload);
+      const { error } = await db.from("rnap_certificates").insert(payload);
       if (error) return toast.error(error.message);
-      await logAction(supabase, session, "CREATE_RNAP", { name: d.nombre_completo });
+      await logAction(db, session, "CREATE_RNAP", { name: d.nombre_completo });
       toast.success("RNAP guardado");
     }
     setEditor(null);
@@ -90,9 +90,9 @@ export function RnapView({ session }: { session: Session }) {
   async function remove(c: Cert) {
     if (!canDelete) { toast.error("No tenés permiso para borrar"); return; }
     if (!confirm(`¿Borrar RNAP de ${c.nombre_completo}?`)) return;
-    const { error } = await supabase.from("rnap_certificates").delete().eq("id", c.id);
+    const { error } = await db.from("rnap_certificates").delete().eq("id", c.id);
     if (error) return toast.error(error.message);
-    await logAction(supabase, session, "DELETE_RNAP", { name: c.nombre_completo });
+    await logAction(db, session, "DELETE_RNAP", { name: c.nombre_completo });
     toast.success("Borrado");
     load();
   }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 import { Session, logAction } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,7 +30,7 @@ export function ListaPdView({ session }: { session: Session }) {
   const alto = session.is_alto_mando;
 
   async function load() {
-    const { data } = await supabase
+    const { data } = await db
       .from("pd_members")
       .select("*")
       .order("nombre", { ascending: true });
@@ -43,11 +43,11 @@ export function ListaPdView({ session }: { session: Session }) {
     e.preventDefault();
     const n = nombre.trim();
     if (!n) return toast.error("Escribe el Nombre_Apellido");
-    const { error } = await supabase.from("pd_members").insert({
+    const { error } = await db.from("pd_members").insert({
       nombre: n, rango: rango || null, created_by: session.id,
     } as any);
     if (error) return toast.error(error.message);
-    await logAction(supabase, session, "CREATE_PD_MEMBER", { nombre: n, rango });
+    await logAction(db, session, "CREATE_PD_MEMBER", { nombre: n, rango });
     setNombre("");
     toast.success(`${n} añadido a la Lista PD`);
     load();
@@ -55,15 +55,15 @@ export function ListaPdView({ session }: { session: Session }) {
 
   async function save(id: string, patch: Partial<PdMember>) {
     setMembers(prev => prev.map(x => (x.id === id ? { ...x, ...patch } : x)));
-    const { error } = await supabase.from("pd_members").update(patch as any).eq("id", id);
+    const { error } = await db.from("pd_members").update(patch as any).eq("id", id);
     if (error) { toast.error(error.message); load(); }
   }
 
   async function remove(m: PdMember) {
     if (!confirm(`¿Eliminar a ${m.nombre} de la Lista PD?`)) return;
-    const { error } = await supabase.from("pd_members").delete().eq("id", m.id);
+    const { error } = await db.from("pd_members").delete().eq("id", m.id);
     if (error) return toast.error(error.message);
-    await logAction(supabase, session, "DELETE_PD_MEMBER", { nombre: m.nombre });
+    await logAction(db, session, "DELETE_PD_MEMBER", { nombre: m.nombre });
     load();
   }
 
