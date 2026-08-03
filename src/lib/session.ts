@@ -17,11 +17,18 @@ export function getSession(): Session | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as Session) : null;
+    if (!raw) return null;
+    // Sessions saved before the signed-token system have no token: treat them as expired.
+    if (!localStorage.getItem("instructor_token")) {
+      localStorage.removeItem(KEY);
+      return null;
+    }
+    return JSON.parse(raw) as Session;
   } catch {
     return null;
   }
 }
+
 
 export function setSession(s: Session | null) {
   if (typeof window === "undefined") return;
