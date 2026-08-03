@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { logAction, setSession, type Session } from "@/lib/session";
 import { getBackground } from "@/lib/appearance";
-import { LogOut, Shield, LogIn } from "lucide-react";
+import { LogOut, Shield, LogIn, UserRound } from "lucide-react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 
 const TABS = [
