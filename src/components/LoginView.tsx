@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Coins } from "lucide-react";
-import { db } from "@/lib/db";
+import { db, setToken } from "@/lib/db";
+import { loginWithId } from "@/lib/data.functions";
+
 
 import { setSession, logAction } from "@/lib/session";
 import { getBackground } from "@/lib/appearance";
