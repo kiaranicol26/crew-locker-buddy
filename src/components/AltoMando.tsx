@@ -167,7 +167,7 @@ export function AltoMando({ session }: { session: Session }) {
             </div>
           </div>
           <form onSubmit={createInstructor} className="grid gap-3 md:grid-cols-4">
-            <Input placeholder="ID (Ej: K-105WZRP)" value={newId}
+            <Input placeholder="ID de acceso" value={newId}
               onChange={e => setNewId(e.target.value)}
               className="h-11 rounded-none border-blue-300 bg-white text-slate-800 font-mono uppercase focus:border-blue-600" />
             <Input placeholder="Nombre" value={newName}
