@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 
 const CHANGES_KEY = "discord_webhook_url";
 const RNAP_KEY = "discord_rnap_webhook_url";
+const ARCHIVO_KEY = "discord_archivo_webhook_url";
 
 const cache: Record<string, { value: string; at: number }> = {};
 
@@ -28,6 +29,67 @@ export const getWebhookUrl = (force = false) => getKey(CHANGES_KEY, force);
 export const setWebhookUrl = (url: string) => setKey(CHANGES_KEY, url);
 export const getRnapWebhookUrl = (force = false) => getKey(RNAP_KEY, force);
 export const setRnapWebhookUrl = (url: string) => setKey(RNAP_KEY, url);
+export const getArchivoWebhookUrl = (force = false) => getKey(ARCHIVO_KEY, force);
+export const setArchivoWebhookUrl = (url: string) => setKey(ARCHIVO_KEY, url);
+
+export async function sendArchivoToDiscord(params: {
+  editorName: string;
+  nombre: string;
+  esPolicia: boolean;
+  gameId?: string | null;
+  foto?: string | null;
+  vetos: { sapd: boolean; edsa: boolean; staff: boolean };
+  capacitaciones: { m4: boolean; edc: boolean; mary: boolean };
+  notas: { autor: string | null; texto: string }[];
+}) {
+  const url = await getArchivoWebhookUrl();
+  if (!url) throw new Error("Webhook de Archivo no configurado");
+  const si = (v: boolean) => (v ? "✅ SÍ" : "❌ NO");
+  const fields: any[] = [
+    { name: "Nombre", value: params.nombre || "—", inline: true },
+    { name: "Es Policía", value: si(params.esPolicia), inline: true },
+    { name: "#ID", value: params.gameId ? `${params.gameId}\n-# Ver en /id ${params.gameId}` : "—", inline: true },
+    {
+      name: "Corresponde a Vetos",
+      value: `SAPD: ${si(params.vetos.sapd)}\nEDSA: ${si(params.vetos.edsa)}\nSTAFF: ${si(params.vetos.staff)}`,
+      inline: false,
+    },
+    {
+      name: "Capacitaciones",
+      value: params.esPolicia
+        ? `M4: ${si(params.capacitaciones.m4)}\nEDC: ${si(params.capacitaciones.edc)}\nMARY: ${si(params.capacitaciones.mary)}`
+        : "NO ES POLICÍA",
+      inline: false,
+    },
+  ];
+  if (params.notas.length) {
+    fields.push({
+      name: "Notas",
+      value: params.notas
+        .map(n => `• **Nota de ${n.autor ?? "—"}:** ${n.texto}`)
+        .join("\n")
+        .slice(0, 1000),
+      inline: false,
+    });
+  }
+  const body = {
+    username: "SAPD · Archivo de Personas",
+    embeds: [{
+      title: `Archivo — ${params.nombre}`,
+      color: 0x1d4ed8,
+      fields,
+      thumbnail: params.foto && /^https?:/.test(params.foto) ? { url: params.foto } : undefined,
+      footer: { text: `Enviado por ${params.editorName} · San Andreas Police Department` },
+      timestamp: new Date().toISOString(),
+    }],
+  };
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`Discord respondió ${res.status}`);
+}
 
 export async function sendRnapToDiscord(params: {
   editorName: string;

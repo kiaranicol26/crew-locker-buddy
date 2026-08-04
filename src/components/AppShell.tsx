@@ -12,6 +12,7 @@ const TABS = [
   { to: "/aspirantes", label: "ASPIRANTES", public: false, alto: false },
   { to: "/rnap", label: "R.N.A.P", public: false, alto: false },
   { to: "/policias", label: "LISTA PD", public: false, alto: false },
+  { to: "/archivo", label: "ARCHIVO", public: false, alto: false },
   { to: "/salario", label: "SALARIO", public: true, alto: false },
   { to: "/perfil", label: "myPERFIL", public: false, alto: false },
   { to: "/alto-mando", label: "ALTO MANDO", public: false, alto: true },
