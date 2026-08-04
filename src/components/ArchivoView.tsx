@@ -1,0 +1,397 @@
+import { useEffect, useMemo, useState } from "react";
+import { db } from "@/lib/db";
+import { logAction, type Session } from "@/lib/session";
+import { fileToCompressedDataUrl } from "@/lib/appearance";
+import { sendArchivoToDiscord } from "@/lib/discord";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { Plus, Trash2, Send, UserRound, Search } from "lucide-react";
+import sapdLogo from "@/assets/sapd-logo.png.asset.json";
+
+type Persona = {
+  id: string;
+  nombre: string;
+  foto: string | null;
+  es_policia: boolean;
+  game_id: string | null;
+  veto_sapd: boolean;
+  veto_edsa: boolean;
+  veto_staff: boolean;
+  cap_m4: boolean;
+  cap_edc: boolean;
+  cap_mary: boolean;
+  created_by: string | null;
+};
+
+type Nota = {
+  id: string;
+  persona_id: string;
+  autor: string | null;
+  texto: string;
+  created_at: string;
+};
+
+type Rnap = { nombre_completo: string; foto: string | null };
+
+const norm = (s?: string | null) =>
+  (s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[_\s]+/g, " ").trim().toLowerCase();
+
+function Toggle({
+  value,
+  onChange,
+  disabled,
+  disabledLabel,
+}: {
+  value: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+  disabledLabel?: string;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => onChange(!value)}
+      className={`px-3 py-1.5 text-xs font-black uppercase tracking-widest border-2 transition-colors ${
+        disabled
+          ? "border-slate-300 bg-slate-100 text-slate-400 cursor-not-allowed"
+          : value
+            ? "border-green-600 bg-green-50 text-green-700 hover:bg-green-100"
+            : "border-red-500 bg-red-50 text-red-600 hover:bg-red-100"
+      }`}
+    >
+      {disabled ? (disabledLabel ?? "No editable") : value ? "SÍ" : "NO"}
+    </button>
+  );
+}
+
+export function ArchivoView({ session }: { session: Session }) {
+  const canEdit = !!session.is_alto_mando || !!session.can_edit_files;
+  const [personas, setPersonas] = useState<Persona[]>([]);
+  const [notas, setNotas] = useState<Nota[]>([]);
+  const [rnaps, setRnaps] = useState<Rnap[]>([]);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [q, setQ] = useState("");
+  const [newNota, setNewNota] = useState("");
+  const [sending, setSending] = useState(false);
+
+  async function load() {
+    const [p, n, r] = await Promise.all([
+      db.from("archivo_personas").select("*").order("nombre", { ascending: true }),
+      db.from("archivo_notas").select("*").order("created_at", { ascending: true }),
+      db.from("rnap_certificates").select("nombre_completo, foto"),
+    ]);
+    if (p.data) setPersonas(p.data as Persona[]);
+    if (n.data) setNotas(n.data as Nota[]);
+    if (r.data) setRnaps(r.data as Rnap[]);
+  }
+
+  useEffect(() => { load(); }, []);
+
+  const open = personas.find(p => p.id === openId) ?? null;
+  const openNotas = useMemo(() => notas.filter(n => n.persona_id === openId), [notas, openId]);
+  const rnapFoto = useMemo(() => {
+    if (!open) return null;
+    const m = rnaps.find(r => norm(r.nombre_completo) === norm(open.nombre));
+    return m?.foto ?? null;
+  }, [open, rnaps]);
+
+  const filtered = useMemo(() => {
+    const t = norm(q);
+    return t ? personas.filter(p => norm(p.nombre).includes(t) || (p.game_id ?? "").includes(q.trim())) : personas;
+  }, [personas, q]);
+
+  async function createPersona() {
+    const nombre = prompt("Nombre de la persona:")?.trim();
+    if (!nombre) return;
+    const { data, error } = await db
+      .from("archivo_personas")
+      .insert({ nombre, created_by: session.id })
+      .select("*");
+    if (error) return toast.error(error.message);
+    await logAction(db, session, "CREATE_ARCHIVO", { nombre });
+    toast.success("Persona añadida al archivo");
+    await load();
+    const created = Array.isArray(data) ? (data[0] as Persona) : null;
+    if (created) setOpenId(created.id);
+  }
+
+  async function patch(id: string, values: Partial<Persona>) {
+    setPersonas(prev => prev.map(p => (p.id === id ? { ...p, ...values } : p)));
+    const { error } = await db.from("archivo_personas").update(values as any).eq("id", id);
+    if (error) { toast.error(error.message); load(); }
+  }
+
+  async function removePersona(p: Persona) {
+    if (!confirm(`¿Eliminar el archivo de ${p.nombre}?`)) return;
+    const { error } = await db.from("archivo_personas").delete().eq("id", p.id);
+    if (error) return toast.error(error.message);
+    await logAction(db, session, "DELETE_ARCHIVO", { nombre: p.nombre });
+    setOpenId(null);
+    load();
+  }
+
+  async function onFoto(id: string, file?: File | null) {
+    if (!file) return;
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file);
+      await patch(id, { foto: dataUrl });
+      toast.success("Foto actualizada");
+    } catch (e: any) { toast.error(e.message ?? "Error al subir la imagen"); }
+  }
+
+  async function addNota() {
+    if (!open || !newNota.trim()) return;
+    const { error } = await db.from("archivo_notas").insert({
+      persona_id: open.id, autor: session.name, texto: newNota.trim(),
+    });
+    if (error) return toast.error(error.message);
+    setNewNota("");
+    load();
+  }
+
+  async function removeNota(id: string) {
+    const { error } = await db.from("archivo_notas").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    load();
+  }
+
+  async function sendDiscord() {
+    if (!open) return;
+    setSending(true);
+    try {
+      await sendArchivoToDiscord({
+        editorName: session.name,
+        nombre: open.nombre,
+        esPolicia: open.es_policia,
+        gameId: open.game_id,
+        foto: open.foto ?? rnapFoto,
+        vetos: { sapd: open.veto_sapd, edsa: open.veto_edsa, staff: open.veto_staff },
+        capacitaciones: { m4: open.cap_m4, edc: open.cap_edc, mary: open.cap_mary },
+        notas: openNotas.map(n => ({ autor: n.autor, texto: n.texto })),
+      });
+      await logAction(db, session, "SEND_ARCHIVO_DISCORD", { nombre: open.nombre });
+      toast.success("Enviado a Discord");
+    } catch (e: any) { toast.error(e.message ?? "Error al enviar"); }
+    finally { setSending(false); }
+  }
+
+  return (
+    <div className="space-y-4">
+      <Card className="overflow-hidden border-2 border-blue-300 bg-white shadow-md rounded-none">
+        <div className="h-1.5 bg-blue-700" />
+        <div className="p-5 flex flex-col lg:flex-row lg:items-center gap-4 justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 flex items-center justify-center bg-white border border-blue-200 p-1">
+              <img src={sapdLogo.url} alt="SAPD" className="w-full h-full object-contain" />
+            </div>
+            <div>
+              <p className="text-blue-600 text-xs uppercase tracking-[0.3em] font-bold">
+                San Andreas Police Department
+              </p>
+              <h2 className="text-2xl font-black uppercase tracking-wide text-slate-900 font-display">
+                Archivo de Personas
+              </h2>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-2 top-1/2 -translate-y-1/2" />
+              <Input value={q} onChange={e => setQ(e.target.value)} placeholder="Buscar nombre o #ID"
+                className="h-11 pl-8 rounded-none border-blue-300 bg-white text-slate-800 w-64" />
+            </div>
+            {canEdit && (
+              <Button onClick={createPersona}
+                className="h-11 rounded-none bg-blue-700 hover:bg-blue-800 text-white font-bold">
+                <Plus className="w-4 h-4 mr-1" /> Añadir persona
+              </Button>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+        {filtered.map(p => {
+          const foto = p.foto ?? rnaps.find(r => norm(r.nombre_completo) === norm(p.nombre))?.foto ?? null;
+          return (
+            <button key={p.id} type="button" onClick={() => setOpenId(p.id)}
+              className="group border-2 border-blue-200 bg-white hover:border-blue-600 transition-colors text-left">
+              <div className="aspect-square bg-slate-100 flex items-center justify-center overflow-hidden">
+                {foto ? (
+                  <img src={foto} alt={p.nombre} className="w-full h-full object-cover" />
+                ) : (
+                  <UserRound className="w-12 h-12 text-slate-300" />
+                )}
+              </div>
+              <div className="p-2 border-t-2 border-blue-200">
+                <p className="font-black uppercase text-xs tracking-wider text-slate-800 truncate">{p.nombre}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  {p.es_policia ? "Policía" : "Civil"}{p.game_id ? ` · #${p.game_id}` : ""}
+                </p>
+              </div>
+            </button>
+          );
+        })}
+        {filtered.length === 0 && (
+          <div className="col-span-full p-10 text-center text-slate-500 uppercase tracking-widest font-bold bg-white border-2 border-blue-200">
+            Sin registros en el archivo.
+          </div>
+        )}
+      </div>
+
+      <Dialog open={!!open} onOpenChange={o => !o && setOpenId(null)}>
+        <DialogContent className="max-w-3xl rounded-none border-2 border-blue-300 bg-white max-h-[90vh] overflow-auto">
+          {open && (
+            <div className="space-y-5">
+              <div className="flex items-center justify-between gap-3 border-b-2 border-blue-200 pb-3">
+                <h3 className="text-xl font-black uppercase tracking-wide text-slate-900 font-display">
+                  Ficha de {open.nombre}
+                </h3>
+                {canEdit && (
+                  <Button variant="ghost" onClick={() => removePersona(open)}
+                    className="rounded-none hover:bg-red-100">
+                    <Trash2 className="w-4 h-4 text-red-600" />
+                  </Button>
+                )}
+              </div>
+
+              <div className="grid gap-5 md:grid-cols-[160px_1fr]">
+                <div className="space-y-2">
+                  <div className="aspect-square border-2 border-blue-300 bg-slate-100 flex items-center justify-center overflow-hidden">
+                    {open.foto ? (
+                      <img src={open.foto} alt={open.nombre} className="w-full h-full object-cover" />
+                    ) : (
+                      <UserRound className="w-12 h-12 text-slate-300" />
+                    )}
+                  </div>
+                  {canEdit && (
+                    <>
+                      <Input value={open.foto?.startsWith("data:") ? "" : open.foto ?? ""}
+                        onChange={e => patch(open.id, { foto: e.target.value })}
+                        placeholder="Link de imagen"
+                        className="h-9 rounded-none border-blue-300 text-xs" />
+                      <label className="h-9 w-full inline-flex items-center justify-center border-2 border-blue-300 bg-white text-blue-800 font-bold text-xs cursor-pointer hover:bg-blue-50">
+                        Subir imagen
+                        <input type="file" accept="image/*" className="hidden"
+                          onChange={e => onFoto(open.id, e.target.files?.[0])} />
+                      </label>
+                    </>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-1">Nombre</p>
+                    <Input value={open.nombre} readOnly={!canEdit}
+                      onChange={e => patch(open.id, { nombre: e.target.value })}
+                      className="h-10 rounded-none border-blue-300 font-bold" />
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">Es Policía</p>
+                    <Toggle value={open.es_policia} disabled={!canEdit}
+                      onChange={v => patch(open.id, { es_policia: v })} />
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-1">R.N.A.P</p>
+                    {rnapFoto ? (
+                      <img src={rnapFoto} alt="RNAP" className="max-h-48 border-2 border-blue-300" />
+                    ) : (
+                      <p className="text-xs font-bold text-slate-400">Sin certificado R.N.A.P para este nombre.</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                      Corresponde a Vetos
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      {([["SAPD", "veto_sapd"], ["EDSA", "veto_edsa"], ["STAFF", "veto_staff"]] as const).map(([label, key]) => (
+                        <div key={key} className="flex items-center gap-2">
+                          <span className="text-xs font-black uppercase text-slate-700">{label}</span>
+                          <Toggle value={open[key]} disabled={!canEdit}
+                            onChange={v => patch(open.id, { [key]: v } as Partial<Persona>)} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-1">#ID</p>
+                    <Input value={open.game_id ?? ""} readOnly={!canEdit}
+                      onChange={e => patch(open.id, { game_id: e.target.value })}
+                      placeholder="123"
+                      className="h-10 rounded-none border-blue-300 font-mono w-40" />
+                    <p className="text-[11px] font-bold text-slate-400 mt-1">
+                      -# Ver en /id {open.game_id || "[ID]"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                      Capacitaciones
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      {([["M4", "cap_m4"], ["EDC", "cap_edc"], ["MARY", "cap_mary"]] as const).map(([label, key]) => (
+                        <div key={key} className="flex items-center gap-2">
+                          <span className="text-xs font-black uppercase text-slate-700">{label}</span>
+                          <Toggle value={open[key]} disabled={!canEdit || !open.es_policia}
+                            disabledLabel={!open.es_policia ? "No es policía" : "No editable"}
+                            onChange={v => patch(open.id, { [key]: v } as Partial<Persona>)} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t-2 border-blue-200 pt-4 space-y-3">
+                <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">Notas</p>
+                <div className="space-y-2">
+                  {openNotas.map(n => (
+                    <div key={n.id} className="flex items-start justify-between gap-2 bg-blue-50/60 border border-blue-200 p-2">
+                      <p className="text-sm text-slate-700 font-semibold">
+                        <span className="text-blue-700">Nota de {n.autor ?? "—"}:</span> {n.texto}
+                      </p>
+                      {canEdit && (
+                        <button type="button" onClick={() => removeNota(n.id)}
+                          className="text-red-600 hover:text-red-800">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {openNotas.length === 0 && (
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Sin notas.</p>
+                  )}
+                </div>
+                {canEdit && (
+                  <div className="flex gap-2">
+                    <Textarea value={newNota} onChange={e => setNewNota(e.target.value)}
+                      placeholder="Escribe una nota…"
+                      className="rounded-none border-blue-300 min-h-[44px]" />
+                    <Button onClick={addNota} className="rounded-none bg-blue-700 hover:bg-blue-800 text-white font-bold">
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end border-t-2 border-blue-200 pt-4">
+                <Button onClick={sendDiscord} disabled={sending}
+                  className="rounded-none bg-blue-700 hover:bg-blue-800 text-white font-bold">
+                  <Send className="w-4 h-4 mr-2" /> {sending ? "Enviando…" : "Enviar a Discord"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
