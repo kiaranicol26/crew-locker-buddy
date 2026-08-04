@@ -32,6 +32,92 @@ export type Database = {
         }
         Relationships: []
       }
+      archivo_notas: {
+        Row: {
+          autor: string | null
+          created_at: string
+          id: string
+          persona_id: string
+          texto: string
+          updated_at: string
+        }
+        Insert: {
+          autor?: string | null
+          created_at?: string
+          id?: string
+          persona_id: string
+          texto: string
+          updated_at?: string
+        }
+        Update: {
+          autor?: string | null
+          created_at?: string
+          id?: string
+          persona_id?: string
+          texto?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "archivo_notas_persona_id_fkey"
+            columns: ["persona_id"]
+            isOneToOne: false
+            referencedRelation: "archivo_personas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      archivo_personas: {
+        Row: {
+          cap_edc: boolean
+          cap_m4: boolean
+          cap_mary: boolean
+          created_at: string
+          created_by: string | null
+          es_policia: boolean
+          foto: string | null
+          game_id: string | null
+          id: string
+          nombre: string
+          updated_at: string
+          veto_edsa: boolean
+          veto_sapd: boolean
+          veto_staff: boolean
+        }
+        Insert: {
+          cap_edc?: boolean
+          cap_m4?: boolean
+          cap_mary?: boolean
+          created_at?: string
+          created_by?: string | null
+          es_policia?: boolean
+          foto?: string | null
+          game_id?: string | null
+          id?: string
+          nombre: string
+          updated_at?: string
+          veto_edsa?: boolean
+          veto_sapd?: boolean
+          veto_staff?: boolean
+        }
+        Update: {
+          cap_edc?: boolean
+          cap_m4?: boolean
+          cap_mary?: boolean
+          created_at?: string
+          created_by?: string | null
+          es_policia?: boolean
+          foto?: string | null
+          game_id?: string | null
+          id?: string
+          nombre?: string
+          updated_at?: string
+          veto_edsa?: boolean
+          veto_sapd?: boolean
+          veto_staff?: boolean
+        }
+        Relationships: []
+      }
       aspirantes: {
         Row: {
           created_at: string
@@ -81,6 +167,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           can_delete: boolean
+          can_edit_files: boolean
           can_emit_rnap: boolean
           created_at: string
           created_by: string | null
@@ -93,6 +180,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           can_delete?: boolean
+          can_edit_files?: boolean
           can_emit_rnap?: boolean
           created_at?: string
           created_by?: string | null
@@ -105,6 +193,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           can_delete?: boolean
+          can_edit_files?: boolean
           can_emit_rnap?: boolean
           created_at?: string
           created_by?: string | null
