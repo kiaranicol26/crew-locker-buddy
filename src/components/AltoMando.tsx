@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   getWebhookUrl, setWebhookUrl,
   getRnapWebhookUrl, setRnapWebhookUrl,
+  getArchivoWebhookUrl, setArchivoWebhookUrl,
 } from "@/lib/discord";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -25,6 +26,7 @@ type Instructor = {
   role: string;
   can_delete: boolean;
   can_emit_rnap: boolean;
+  can_edit_files: boolean;
   created_at: string;
   created_by: string | null;
 };
@@ -49,6 +51,8 @@ export function AltoMando({ session }: { session: Session }) {
   const [savingHook, setSavingHook] = useState(false);
   const [rnapHook, setRnapHook] = useState("");
   const [savingRnap, setSavingRnap] = useState(false);
+  const [archivoHook, setArchivoHook] = useState("");
+  const [savingArchivo, setSavingArchivo] = useState(false);
   const [bg, setBg] = useState("");
   const [savingBg, setSavingBg] = useState(false);
 
@@ -66,6 +70,7 @@ export function AltoMando({ session }: { session: Session }) {
     loadAll();
     getWebhookUrl(true).then(setWebhook);
     getRnapWebhookUrl(true).then(setRnapHook);
+    getArchivoWebhookUrl(true).then(setArchivoHook);
     getBackground().then(setBg);
   }, []);
 
@@ -109,6 +114,16 @@ export function AltoMando({ session }: { session: Session }) {
     finally { setSavingRnap(false); }
   }
 
+  async function saveArchivoWebhook() {
+    setSavingArchivo(true);
+    try {
+      await setArchivoWebhookUrl(archivoHook);
+      await logAction(db, session, "UPDATE_ARCHIVO_WEBHOOK", { url: archivoHook ? "(set)" : "(cleared)" });
+      toast.success("Webhook de Archivo guardado");
+    } catch (e: any) { toast.error(e.message ?? "Error"); }
+    finally { setSavingArchivo(false); }
+  }
+
   async function createInstructor(e: React.FormEvent) {
     e.preventDefault();
     const id = newId.trim().toUpperCase();
@@ -139,7 +154,7 @@ export function AltoMando({ session }: { session: Session }) {
     loadAll();
   }
 
-  async function togglePerm(i: Instructor, field: "can_delete" | "can_emit_rnap", value: boolean) {
+  async function togglePerm(i: Instructor, field: "can_delete" | "can_emit_rnap" | "can_edit_files", value: boolean) {
     if (i.is_alto_mando) { toast.info("Los Comisarios tienen todos los permisos"); return; }
     setInstructors(prev => prev.map(x => x.id === i.id ? { ...x, [field]: value } : x));
     const { error } = await db.from("instructors").update({ [field]: value } as any).eq("id", i.id);
@@ -240,6 +255,30 @@ export function AltoMando({ session }: { session: Session }) {
             </div>
           </div>
         </Card>
+
+        <Card className="overflow-hidden border border-blue-200 bg-white shadow-sm rounded-none">
+          <div className="h-1 bg-blue-600" />
+          <div className="p-5 space-y-4">
+            <div className="flex items-center gap-3">
+              <FileText className="w-5 h-5 text-blue-600" />
+              <h2 className="text-xl font-black uppercase tracking-wide text-slate-900 font-display">
+                Webhook de Archivo
+              </h2>
+            </div>
+            <p className="text-slate-500 text-sm">
+              Canal al que se enviarán las fichas del Archivo de Personas.
+            </p>
+            <div className="flex gap-2">
+              <Input value={archivoHook} onChange={e => setArchivoHook(e.target.value)}
+                placeholder="https://discord.com/api/webhooks/..."
+                className="h-11 rounded-none border-blue-300 bg-white text-slate-800 font-mono text-sm" />
+              <Button onClick={saveArchivoWebhook} disabled={savingArchivo}
+                className="h-11 rounded-none bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+                {savingArchivo ? "..." : "Guardar"}
+              </Button>
+            </div>
+          </div>
+        </Card>
       </div>
 
       {/* FONDO DE LA WEB */}
@@ -299,6 +338,7 @@ export function AltoMando({ session }: { session: Session }) {
                   <th className="p-3 text-left border border-blue-500 uppercase font-bold">Rol</th>
                   <th className="p-3 text-center border border-blue-500 uppercase font-bold">Borrar agentes</th>
                   <th className="p-3 text-center border border-blue-500 uppercase font-bold">Emitir RNAP</th>
+                  <th className="p-3 text-center border border-blue-500 uppercase font-bold">Editar Archivos</th>
                   <th className="p-3 text-left border border-blue-500 uppercase font-bold">Creado por</th>
                   <th className="p-3 border border-blue-500 w-10" />
                 </tr>
@@ -331,6 +371,13 @@ export function AltoMando({ session }: { session: Session }) {
                         onCheckedChange={v => togglePerm(i, "can_emit_rnap", v)}
                       />
                     </td>
+                    <td className="p-3 text-center border border-slate-200">
+                      <Switch
+                        checked={i.is_alto_mando || !!i.can_edit_files}
+                        disabled={i.is_alto_mando}
+                        onCheckedChange={v => togglePerm(i, "can_edit_files", v)}
+                      />
+                    </td>
                     <td className="p-3 text-slate-500 border border-slate-200">{i.created_by ?? "—"}</td>
                     <td className="p-3 text-center border border-slate-200">
                       <Button size="icon" variant="ghost"
@@ -343,7 +390,7 @@ export function AltoMando({ session }: { session: Session }) {
                 ))}
                 {instructors.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="p-10 text-center text-slate-400 uppercase tracking-widest">
+                    <td colSpan={8} className="p-10 text-center text-slate-400 uppercase tracking-widest">
                       Sin personal autorizado.
                     </td>
                   </tr>
