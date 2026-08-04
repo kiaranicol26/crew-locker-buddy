@@ -6,6 +6,7 @@ export type Claims = {
   alto: boolean;
   del: boolean;
   rnap: boolean;
+  files?: boolean;
   exp: number;
 };
 
@@ -25,6 +26,8 @@ export type QuerySpec = {
 
 const TABLES = new Set([
   "app_settings",
+  "archivo_personas",
+  "archivo_notas",
   "aspirantes",
   "instructors",
   "logs",
@@ -132,6 +135,12 @@ export function authorize(spec: QuerySpec, claims: Claims | null): QuerySpec {
       if (!alto) deny("Solo Alto Mando");
       return spec;
     }
+
+    case "archivo_personas":
+    case "archivo_notas":
+      if (!claims) deny();
+      if (write && !alto && !claims.files) deny("Sin permiso para editar archivos");
+      return spec;
 
     case "aspirantes":
     case "records":

@@ -7,6 +7,7 @@ export type Session = {
   is_alto_mando: boolean;
   can_delete: boolean;
   can_emit_rnap: boolean;
+  can_edit_files?: boolean;
   avatar_url?: string | null;
   descripcion?: string | null;
 };
