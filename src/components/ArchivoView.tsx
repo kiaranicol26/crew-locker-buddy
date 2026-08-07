@@ -36,7 +36,14 @@ type Nota = {
 };
 
 type Rnap = { nombre_completo: string; foto: string | null };
-type Usuario = { id: string; name: string; avatar_url: string | null; descripcion: string | null };
+type Usuario = {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  descripcion: string | null;
+  role: string | null;
+  is_alto_mando: boolean;
+};
 
 type Item = {
   key: string;
@@ -44,8 +51,19 @@ type Item = {
   foto: string | null;
   descripcion: string | null;
   isUser: boolean;
+  rol: string | null;
   persona: Persona | null;
 };
+
+const ROL_LABEL: Record<string, string> = {
+  Comisario: "Comisario (Alto Mando)",
+  Cupula: "Cúpula Administrativa",
+  Instructor: "Instructor",
+};
+
+const rolLabel = (rol?: string | null) => (rol ? (ROL_LABEL[rol] ?? rol) : "Usuario");
+
+const randomGameId = () => String(Math.floor(100 + Math.random() * 900));
 
 function Toggle({
   value,
@@ -92,7 +110,7 @@ export function ArchivoView({ session }: { session: Session }) {
       db.from("archivo_personas").select("*").order("nombre", { ascending: true }),
       db.from("archivo_notas").select("*").order("created_at", { ascending: true }),
       db.from("rnap_certificates").select("nombre_completo, foto"),
-      db.from("instructors").select("id,name,avatar_url,descripcion"),
+      db.from("instructors").select("id,name,avatar_url,descripcion,role,is_alto_mando"),
     ]);
     if (p.data) setPersonas(p.data as Persona[]);
     if (n.data) setNotas(n.data as Nota[]);
@@ -114,6 +132,7 @@ export function ArchivoView({ session }: { session: Session }) {
         foto: u.avatar_url ?? persona?.foto ?? rnapFotoDe(u.name),
         descripcion: u.descripcion ?? null,
         isUser: true,
+        rol: u.is_alto_mando ? "Comisario" : (u.role ?? null),
         persona,
       };
     });
@@ -126,6 +145,7 @@ export function ArchivoView({ session }: { session: Session }) {
         foto: rnapFotoDe(p.nombre) ?? p.foto,
         descripcion: null,
         isUser: false,
+        rol: null,
         persona: p,
       }));
     return [...userItems, ...archived];
@@ -148,11 +168,24 @@ export function ArchivoView({ session }: { session: Session }) {
   }, [items, q]);
 
   // Los usuarios con login necesitan una ficha para guardar datos: se crea al abrirla.
+  // El #ID se asigna aleatoriamente y no es editable.
   async function openItem(item: Item) {
     setOpenKey(item.key);
-    if (item.persona || !item.isUser || !canEdit) return;
-    const { error } = await db.from("archivo_personas").insert({ nombre: item.nombre, created_by: session.id });
-    if (!error) await load();
+    if (!canEdit) return;
+    if (!item.persona) {
+      if (!item.isUser) return;
+      const { error } = await db.from("archivo_personas").insert({
+        nombre: item.nombre, created_by: session.id, game_id: randomGameId(),
+      });
+      if (!error) await load();
+      return;
+    }
+    if (!item.persona.game_id) {
+      const id = item.persona.id;
+      const game_id = randomGameId();
+      setPersonas(prev => prev.map(p => (p.id === id ? { ...p, game_id } : p)));
+      await db.from("archivo_personas").update({ game_id }).eq("id", id);
+    }
   }
 
   async function patch(values: Partial<Persona>) {
@@ -267,7 +300,8 @@ export function ArchivoView({ session }: { session: Session }) {
               )}
               {item.isUser && (
                 <span className="absolute top-0 left-0 bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest px-2 py-0.5 flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3" /> Usuario
+                  <ShieldCheck className="w-3 h-3" />
+                  {item.persona?.es_policia ? rolLabel(item.rol) : "Usuario"}
                 </span>
               )}
             </div>
@@ -366,14 +400,13 @@ export function ArchivoView({ session }: { session: Session }) {
 
                   <div>
                     <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-1">#ID</p>
-                    <Input value={openPersona?.game_id ?? ""} readOnly={!canEdit || !openPersona}
-                      onChange={e => patch({ game_id: e.target.value })}
-                      placeholder="123"
+                    <Input value={openPersona?.game_id ?? ""} readOnly
                       className="h-10 rounded-none border-blue-300 font-mono w-40" />
                     <p className="text-[11px] font-bold text-slate-400 mt-1">
-                      -# Ver en /id {openPersona?.game_id || "[ID]"}
+                      -# Asignado automáticamente por la web
                     </p>
                   </div>
+
 
                   <div>
                     <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">
