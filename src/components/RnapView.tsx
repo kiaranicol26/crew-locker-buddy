@@ -11,6 +11,7 @@ import { Plus, Download, Trash2, Pencil, Upload, X, Send, FileText } from "lucid
 import { toPng, toBlob } from "html-to-image";
 import { sendRnapToDiscord } from "@/lib/discord";
 import rnapTplUrl from "@/assets/rnap-nuevo.png";
+import { ensureArchivoPersona } from "@/lib/archivo";
 
 type Cert = {
   id: string;
@@ -80,6 +81,7 @@ export function RnapView({ session }: { session: Session }) {
     } else {
       const { error } = await db.from("rnap_certificates").insert(payload);
       if (error) return toast.error(error.message);
+      await ensureArchivoPersona(d.nombre_completo, d.foto ?? null);
       await logAction(db, session, "CREATE_RNAP", { name: d.nombre_completo });
       toast.success("RNAP guardado");
     }

@@ -123,6 +123,9 @@ export function authorize(spec: QuerySpec, claims: Claims | null): QuerySpec {
       if (!claims) deny();
       if (spec.op === "select") {
         if (alto) return spec;
+        const cols = (spec.columns ?? "*").split(",").map(c => c.trim()).filter(Boolean);
+        const publicCols = new Set(["id", "name", "avatar_url", "descripcion", "role"]);
+        if (cols.length > 0 && cols.every(c => publicCols.has(c))) return spec;
         return { ...spec, filters: [{ type: "eq", column: "id", value: claims.id }] };
       }
       if (spec.op === "update") {

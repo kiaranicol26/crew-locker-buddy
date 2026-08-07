@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { db } from "@/lib/db";
 import { logAction, type Session } from "@/lib/session";
-import { fileToCompressedDataUrl } from "@/lib/appearance";
 import { sendArchivoToDiscord } from "@/lib/discord";
+import { normName as norm } from "@/lib/archivo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Trash2, Send, UserRound, Search } from "lucide-react";
+import { Plus, Trash2, Send, UserRound, Search, ShieldCheck } from "lucide-react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 
 type Persona = {
@@ -36,9 +36,16 @@ type Nota = {
 };
 
 type Rnap = { nombre_completo: string; foto: string | null };
+type Usuario = { id: string; name: string; avatar_url: string | null; descripcion: string | null };
 
-const norm = (s?: string | null) =>
-  (s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[_\s]+/g, " ").trim().toLowerCase();
+type Item = {
+  key: string;
+  nombre: string;
+  foto: string | null;
+  descripcion: string | null;
+  isUser: boolean;
+  persona: Persona | null;
+};
 
 function Toggle({
   value,
@@ -74,80 +81,102 @@ export function ArchivoView({ session }: { session: Session }) {
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [notas, setNotas] = useState<Nota[]>([]);
   const [rnaps, setRnaps] = useState<Rnap[]>([]);
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [openKey, setOpenKey] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [newNota, setNewNota] = useState("");
   const [sending, setSending] = useState(false);
 
   async function load() {
-    const [p, n, r] = await Promise.all([
+    const [p, n, r, u] = await Promise.all([
       db.from("archivo_personas").select("*").order("nombre", { ascending: true }),
       db.from("archivo_notas").select("*").order("created_at", { ascending: true }),
       db.from("rnap_certificates").select("nombre_completo, foto"),
+      db.from("instructors").select("id,name,avatar_url,descripcion"),
     ]);
     if (p.data) setPersonas(p.data as Persona[]);
     if (n.data) setNotas(n.data as Nota[]);
     if (r.data) setRnaps(r.data as Rnap[]);
+    if (u.data) setUsuarios(u.data as Usuario[]);
   }
 
   useEffect(() => { load(); }, []);
 
-  const open = personas.find(p => p.id === openId) ?? null;
-  const openNotas = useMemo(() => notas.filter(n => n.persona_id === openId), [notas, openId]);
-  const rnapFoto = useMemo(() => {
-    if (!open) return null;
-    const m = rnaps.find(r => norm(r.nombre_completo) === norm(open.nombre));
-    return m?.foto ?? null;
-  }, [open, rnaps]);
+  const rnapFotoDe = (nombre: string) =>
+    rnaps.find(r => norm(r.nombre_completo) === norm(nombre))?.foto ?? null;
+
+  const items = useMemo<Item[]>(() => {
+    const userItems: Item[] = usuarios.map(u => {
+      const persona = personas.find(p => norm(p.nombre) === norm(u.name)) ?? null;
+      return {
+        key: `user:${u.id}`,
+        nombre: u.name,
+        foto: u.avatar_url ?? persona?.foto ?? rnapFotoDe(u.name),
+        descripcion: u.descripcion ?? null,
+        isUser: true,
+        persona,
+      };
+    });
+    const userNames = new Set(usuarios.map(u => norm(u.name)));
+    const archived: Item[] = personas
+      .filter(p => !userNames.has(norm(p.nombre)))
+      .map(p => ({
+        key: `persona:${p.id}`,
+        nombre: p.nombre,
+        foto: rnapFotoDe(p.nombre) ?? p.foto,
+        descripcion: null,
+        isUser: false,
+        persona: p,
+      }));
+    return [...userItems, ...archived];
+  }, [usuarios, personas, rnaps]);
+
+  const open = items.find(i => i.key === openKey) ?? null;
+  const openPersona = open?.persona ?? null;
+  const openNotas = useMemo(
+    () => (openPersona ? notas.filter(n => n.persona_id === openPersona.id) : []),
+    [notas, openPersona],
+  );
+  const rnapFoto = open ? rnapFotoDe(open.nombre) : null;
 
   const filtered = useMemo(() => {
     const t = norm(q);
-    return t ? personas.filter(p => norm(p.nombre).includes(t) || (p.game_id ?? "").includes(q.trim())) : personas;
-  }, [personas, q]);
+    if (!t) return items;
+    return items.filter(
+      i => norm(i.nombre).includes(t) || (i.persona?.game_id ?? "").includes(q.trim()),
+    );
+  }, [items, q]);
 
-  async function createPersona() {
-    const nombre = prompt("Nombre de la persona:")?.trim();
-    if (!nombre) return;
-    const { data, error } = await db
-      .from("archivo_personas")
-      .insert({ nombre, created_by: session.id })
-      .select("*");
-    if (error) return toast.error(error.message);
-    await logAction(db, session, "CREATE_ARCHIVO", { nombre });
-    toast.success("Persona añadida al archivo");
-    await load();
-    const created = Array.isArray(data) ? (data[0] as Persona) : null;
-    if (created) setOpenId(created.id);
+  // Los usuarios con login necesitan una ficha para guardar datos: se crea al abrirla.
+  async function openItem(item: Item) {
+    setOpenKey(item.key);
+    if (item.persona || !item.isUser || !canEdit) return;
+    const { error } = await db.from("archivo_personas").insert({ nombre: item.nombre, created_by: session.id });
+    if (!error) await load();
   }
 
-  async function patch(id: string, values: Partial<Persona>) {
+  async function patch(values: Partial<Persona>) {
+    if (!openPersona) return toast.error("Sin ficha editable todavía");
+    const id = openPersona.id;
     setPersonas(prev => prev.map(p => (p.id === id ? { ...p, ...values } : p)));
     const { error } = await db.from("archivo_personas").update(values as any).eq("id", id);
     if (error) { toast.error(error.message); load(); }
   }
 
-  async function removePersona(p: Persona) {
-    if (!confirm(`¿Eliminar el archivo de ${p.nombre}?`)) return;
-    const { error } = await db.from("archivo_personas").delete().eq("id", p.id);
+  async function removePersona() {
+    if (!openPersona) return;
+    if (!confirm(`¿Eliminar el archivo de ${openPersona.nombre}?`)) return;
+    const { error } = await db.from("archivo_personas").delete().eq("id", openPersona.id);
     if (error) return toast.error(error.message);
-    await logAction(db, session, "DELETE_ARCHIVO", { nombre: p.nombre });
-    setOpenId(null);
+    await logAction(db, session, "DELETE_ARCHIVO", { nombre: openPersona.nombre });
+    setOpenKey(null);
     load();
   }
 
-  async function onFoto(id: string, file?: File | null) {
-    if (!file) return;
-    try {
-      const dataUrl = await fileToCompressedDataUrl(file);
-      await patch(id, { foto: dataUrl });
-      toast.success("Foto actualizada");
-    } catch (e: any) { toast.error(e.message ?? "Error al subir la imagen"); }
-  }
-
   async function addNota() {
-    if (!open || !newNota.trim()) return;
+    if (!openPersona || !newNota.trim()) return;
     const { error } = await db.from("archivo_notas").insert({
-      persona_id: open.id, autor: session.name, texto: newNota.trim(),
+      persona_id: openPersona.id, autor: session.name, texto: newNota.trim(),
     });
     if (error) return toast.error(error.message);
     setNewNota("");
@@ -167,11 +196,19 @@ export function ArchivoView({ session }: { session: Session }) {
       await sendArchivoToDiscord({
         editorName: session.name,
         nombre: open.nombre,
-        esPolicia: open.es_policia,
-        gameId: open.game_id,
+        esPolicia: openPersona?.es_policia ?? open.isUser,
+        gameId: openPersona?.game_id ?? null,
         foto: open.foto ?? rnapFoto,
-        vetos: { sapd: open.veto_sapd, edsa: open.veto_edsa, staff: open.veto_staff },
-        capacitaciones: { m4: open.cap_m4, edc: open.cap_edc, mary: open.cap_mary },
+        vetos: {
+          sapd: openPersona?.veto_sapd ?? false,
+          edsa: openPersona?.veto_edsa ?? false,
+          staff: openPersona?.veto_staff ?? false,
+        },
+        capacitaciones: {
+          m4: openPersona?.cap_m4 ?? false,
+          edc: openPersona?.cap_edc ?? false,
+          mary: openPersona?.cap_mary ?? false,
+        },
         notas: openNotas.map(n => ({ autor: n.autor, texto: n.texto })),
       });
       await logAction(db, session, "SEND_ARCHIVO_DISCORD", { nombre: open.nombre });
@@ -179,6 +216,8 @@ export function ArchivoView({ session }: { session: Session }) {
     } catch (e: any) { toast.error(e.message ?? "Error al enviar"); }
     finally { setSending(false); }
   }
+
+  const esPolicia = openPersona?.es_policia ?? false;
 
   return (
     <div className="space-y-4">
@@ -204,38 +243,44 @@ export function ArchivoView({ session }: { session: Session }) {
               <Input value={q} onChange={e => setQ(e.target.value)} placeholder="Buscar nombre o #ID"
                 className="h-11 pl-8 rounded-none border-blue-300 bg-white text-slate-800 w-64" />
             </div>
-            {canEdit && (
-              <Button onClick={createPersona}
-                className="h-11 rounded-none bg-blue-700 hover:bg-blue-800 text-white font-bold">
-                <Plus className="w-4 h-4 mr-1" /> Añadir persona
-              </Button>
-            )}
           </div>
+        </div>
+        <div className="px-5 pb-4 -mt-1">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+            Los agentes con usuario aparecen anclados arriba. Las demás fichas se crean automáticamente
+            al emitir un Antecedente (R.N.A.P).
+          </p>
         </div>
       </Card>
 
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-        {filtered.map(p => {
-          const foto = p.foto ?? rnaps.find(r => norm(r.nombre_completo) === norm(p.nombre))?.foto ?? null;
-          return (
-            <button key={p.id} type="button" onClick={() => setOpenId(p.id)}
-              className="group border-2 border-blue-200 bg-white hover:border-blue-600 transition-colors text-left">
-              <div className="aspect-square bg-slate-100 flex items-center justify-center overflow-hidden">
-                {foto ? (
-                  <img src={foto} alt={p.nombre} className="w-full h-full object-cover" />
-                ) : (
-                  <UserRound className="w-12 h-12 text-slate-300" />
-                )}
-              </div>
-              <div className="p-2 border-t-2 border-blue-200">
-                <p className="font-black uppercase text-xs tracking-wider text-slate-800 truncate">{p.nombre}</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                  {p.es_policia ? "Policía" : "Civil"}{p.game_id ? ` · #${p.game_id}` : ""}
-                </p>
-              </div>
-            </button>
-          );
-        })}
+        {filtered.map(item => (
+          <button key={item.key} type="button" onClick={() => openItem(item)}
+            className={`group border-2 bg-white transition-colors text-left ${
+              item.isUser ? "border-blue-600 shadow-md" : "border-blue-200 hover:border-blue-600"
+            }`}>
+            <div className="aspect-square bg-slate-100 flex items-center justify-center overflow-hidden relative">
+              {item.foto ? (
+                <img src={item.foto} alt={item.nombre} className="w-full h-full object-cover" />
+              ) : (
+                <UserRound className="w-12 h-12 text-slate-300" />
+              )}
+              {item.isUser && (
+                <span className="absolute top-0 left-0 bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest px-2 py-0.5 flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3" /> Usuario
+                </span>
+              )}
+            </div>
+            <div className="p-2 border-t-2 border-blue-200">
+              <p className="font-black uppercase text-xs tracking-wider text-slate-800 truncate">{item.nombre}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 truncate">
+                {item.isUser
+                  ? item.descripcion || "Agente con usuario"
+                  : `${item.persona?.es_policia ? "Policía" : "Archivado"}${item.persona?.game_id ? ` · #${item.persona.game_id}` : ""}`}
+              </p>
+            </div>
+          </button>
+        ))}
         {filtered.length === 0 && (
           <div className="col-span-full p-10 text-center text-slate-500 uppercase tracking-widest font-bold bg-white border-2 border-blue-200">
             Sin registros en el archivo.
@@ -243,7 +288,7 @@ export function ArchivoView({ session }: { session: Session }) {
         )}
       </div>
 
-      <Dialog open={!!open} onOpenChange={o => !o && setOpenId(null)}>
+      <Dialog open={!!open} onOpenChange={o => !o && setOpenKey(null)}>
         <DialogContent className="max-w-3xl rounded-none border-2 border-blue-300 bg-white max-h-[90vh] overflow-auto">
           {open && (
             <div className="space-y-5">
@@ -251,8 +296,8 @@ export function ArchivoView({ session }: { session: Session }) {
                 <h3 className="text-xl font-black uppercase tracking-wide text-slate-900 font-display">
                   Ficha de {open.nombre}
                 </h3>
-                {canEdit && (
-                  <Button variant="ghost" onClick={() => removePersona(open)}
+                {canEdit && !open.isUser && openPersona && (
+                  <Button variant="ghost" onClick={removePersona}
                     className="rounded-none hover:bg-red-100">
                     <Trash2 className="w-4 h-4 text-red-600" />
                   </Button>
@@ -268,33 +313,31 @@ export function ArchivoView({ session }: { session: Session }) {
                       <UserRound className="w-12 h-12 text-slate-300" />
                     )}
                   </div>
-                  {canEdit && (
-                    <>
-                      <Input value={open.foto?.startsWith("data:") ? "" : open.foto ?? ""}
-                        onChange={e => patch(open.id, { foto: e.target.value })}
-                        placeholder="Link de imagen"
-                        className="h-9 rounded-none border-blue-300 text-xs" />
-                      <label className="h-9 w-full inline-flex items-center justify-center border-2 border-blue-300 bg-white text-blue-800 font-bold text-xs cursor-pointer hover:bg-blue-50">
-                        Subir imagen
-                        <input type="file" accept="image/*" className="hidden"
-                          onChange={e => onFoto(open.id, e.target.files?.[0])} />
-                      </label>
-                    </>
-                  )}
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 text-center">
+                    {open.isUser ? "Foto de myPerfil" : "Foto del R.N.A.P"}
+                  </p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
                     <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-1">Nombre</p>
-                    <Input value={open.nombre} readOnly={!canEdit}
-                      onChange={e => patch(open.id, { nombre: e.target.value })}
+                    <Input value={open.nombre} readOnly
                       className="h-10 rounded-none border-blue-300 font-bold" />
                   </div>
 
+                  {open.isUser && (
+                    <div>
+                      <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-1">Descripción</p>
+                      <p className="text-sm font-semibold text-slate-700 bg-blue-50/60 border border-blue-200 p-2">
+                        {open.descripcion || "Sin descripción en myPerfil."}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-3">
                     <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">Es Policía</p>
-                    <Toggle value={open.es_policia} disabled={!canEdit}
-                      onChange={v => patch(open.id, { es_policia: v })} />
+                    <Toggle value={esPolicia} disabled={!canEdit || !openPersona}
+                      onChange={v => patch({ es_policia: v })} />
                   </div>
 
                   <div>
@@ -314,8 +357,8 @@ export function ArchivoView({ session }: { session: Session }) {
                       {([["SAPD", "veto_sapd"], ["EDSA", "veto_edsa"], ["STAFF", "veto_staff"]] as const).map(([label, key]) => (
                         <div key={key} className="flex items-center gap-2">
                           <span className="text-xs font-black uppercase text-slate-700">{label}</span>
-                          <Toggle value={open[key]} disabled={!canEdit}
-                            onChange={v => patch(open.id, { [key]: v } as Partial<Persona>)} />
+                          <Toggle value={openPersona?.[key] ?? false} disabled={!canEdit || !openPersona}
+                            onChange={v => patch({ [key]: v } as Partial<Persona>)} />
                         </div>
                       ))}
                     </div>
@@ -323,12 +366,12 @@ export function ArchivoView({ session }: { session: Session }) {
 
                   <div>
                     <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-1">#ID</p>
-                    <Input value={open.game_id ?? ""} readOnly={!canEdit}
-                      onChange={e => patch(open.id, { game_id: e.target.value })}
+                    <Input value={openPersona?.game_id ?? ""} readOnly={!canEdit || !openPersona}
+                      onChange={e => patch({ game_id: e.target.value })}
                       placeholder="123"
                       className="h-10 rounded-none border-blue-300 font-mono w-40" />
                     <p className="text-[11px] font-bold text-slate-400 mt-1">
-                      -# Ver en /id {open.game_id || "[ID]"}
+                      -# Ver en /id {openPersona?.game_id || "[ID]"}
                     </p>
                   </div>
 
@@ -340,9 +383,10 @@ export function ArchivoView({ session }: { session: Session }) {
                       {([["M4", "cap_m4"], ["EDC", "cap_edc"], ["MARY", "cap_mary"]] as const).map(([label, key]) => (
                         <div key={key} className="flex items-center gap-2">
                           <span className="text-xs font-black uppercase text-slate-700">{label}</span>
-                          <Toggle value={open[key]} disabled={!canEdit || !open.es_policia}
-                            disabledLabel={!open.es_policia ? "No es policía" : "No editable"}
-                            onChange={v => patch(open.id, { [key]: v } as Partial<Persona>)} />
+                          <Toggle value={openPersona?.[key] ?? false}
+                            disabled={!canEdit || !openPersona || !esPolicia}
+                            disabledLabel={!esPolicia ? "No es policía" : "No editable"}
+                            onChange={v => patch({ [key]: v } as Partial<Persona>)} />
                         </div>
                       ))}
                     </div>
@@ -370,7 +414,7 @@ export function ArchivoView({ session }: { session: Session }) {
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Sin notas.</p>
                   )}
                 </div>
-                {canEdit && (
+                {canEdit && openPersona && (
                   <div className="flex gap-2">
                     <Textarea value={newNota} onChange={e => setNewNota(e.target.value)}
                       placeholder="Escribe una nota…"
