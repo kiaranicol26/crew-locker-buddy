@@ -24,7 +24,7 @@ jobs:
                 {
                   \"name\": \"👮 Autor\",
                   \"value\": \"Kendo <@564161518027931650>\",
-                  \"inline\": true
+                  \"inline\": true 
                 },
                 {
                   \"name\": \"🕒 Hora de Edición\",
