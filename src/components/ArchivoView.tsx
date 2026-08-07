@@ -132,6 +132,7 @@ export function ArchivoView({ session }: { session: Session }) {
         foto: u.avatar_url ?? persona?.foto ?? rnapFotoDe(u.name),
         descripcion: u.descripcion ?? null,
         isUser: true,
+        rol: u.is_alto_mando ? "Comisario" : (u.role ?? null),
         persona,
       };
     });
@@ -144,6 +145,7 @@ export function ArchivoView({ session }: { session: Session }) {
         foto: rnapFotoDe(p.nombre) ?? p.foto,
         descripcion: null,
         isUser: false,
+        rol: null,
         persona: p,
       }));
     return [...userItems, ...archived];
