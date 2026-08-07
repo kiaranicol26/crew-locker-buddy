@@ -110,7 +110,7 @@ export function ArchivoView({ session }: { session: Session }) {
       db.from("archivo_personas").select("*").order("nombre", { ascending: true }),
       db.from("archivo_notas").select("*").order("created_at", { ascending: true }),
       db.from("rnap_certificates").select("nombre_completo, foto"),
-      db.from("instructors").select("id,name,avatar_url,descripcion"),
+      db.from("instructors").select("id,name,avatar_url,descripcion,role,is_alto_mando"),
     ]);
     if (p.data) setPersonas(p.data as Persona[]);
     if (n.data) setNotas(n.data as Nota[]);
