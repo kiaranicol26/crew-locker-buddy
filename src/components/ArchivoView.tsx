@@ -168,11 +168,24 @@ export function ArchivoView({ session }: { session: Session }) {
   }, [items, q]);
 
   // Los usuarios con login necesitan una ficha para guardar datos: se crea al abrirla.
+  // El #ID se asigna aleatoriamente y no es editable.
   async function openItem(item: Item) {
     setOpenKey(item.key);
-    if (item.persona || !item.isUser || !canEdit) return;
-    const { error } = await db.from("archivo_personas").insert({ nombre: item.nombre, created_by: session.id });
-    if (!error) await load();
+    if (!canEdit) return;
+    if (!item.persona) {
+      if (!item.isUser) return;
+      const { error } = await db.from("archivo_personas").insert({
+        nombre: item.nombre, created_by: session.id, game_id: randomGameId(),
+      });
+      if (!error) await load();
+      return;
+    }
+    if (!item.persona.game_id) {
+      const id = item.persona.id;
+      const game_id = randomGameId();
+      setPersonas(prev => prev.map(p => (p.id === id ? { ...p, game_id } : p)));
+      await db.from("archivo_personas").update({ game_id }).eq("id", id);
+    }
   }
 
   async function patch(values: Partial<Persona>) {
