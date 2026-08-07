@@ -36,7 +36,14 @@ type Nota = {
 };
 
 type Rnap = { nombre_completo: string; foto: string | null };
-type Usuario = { id: string; name: string; avatar_url: string | null; descripcion: string | null };
+type Usuario = {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  descripcion: string | null;
+  role: string | null;
+  is_alto_mando: boolean;
+};
 
 type Item = {
   key: string;
@@ -44,8 +51,19 @@ type Item = {
   foto: string | null;
   descripcion: string | null;
   isUser: boolean;
+  rol: string | null;
   persona: Persona | null;
 };
+
+const ROL_LABEL: Record<string, string> = {
+  Comisario: "Comisario (Alto Mando)",
+  Cupula: "Cúpula Administrativa",
+  Instructor: "Instructor",
+};
+
+const rolLabel = (rol?: string | null) => (rol ? (ROL_LABEL[rol] ?? rol) : "Usuario");
+
+const randomGameId = () => String(Math.floor(100 + Math.random() * 900));
 
 function Toggle({
   value,
