@@ -287,7 +287,8 @@ export function ArchivoView({ session }: { session: Session }) {
               )}
               {item.isUser && (
                 <span className="absolute top-0 left-0 bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest px-2 py-0.5 flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3" /> Usuario
+                  <ShieldCheck className="w-3 h-3" />
+                  {item.persona?.es_policia ? rolLabel(item.rol) : "Usuario"}
                 </span>
               )}
             </div>
