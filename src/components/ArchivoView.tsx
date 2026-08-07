@@ -386,14 +386,13 @@ export function ArchivoView({ session }: { session: Session }) {
 
                   <div>
                     <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-1">#ID</p>
-                    <Input value={openPersona?.game_id ?? ""} readOnly={!canEdit || !openPersona}
-                      onChange={e => patch({ game_id: e.target.value })}
-                      placeholder="123"
+                    <Input value={openPersona?.game_id ?? ""} readOnly
                       className="h-10 rounded-none border-blue-300 font-mono w-40" />
                     <p className="text-[11px] font-bold text-slate-400 mt-1">
-                      -# Ver en /id {openPersona?.game_id || "[ID]"}
+                      -# Asignado automáticamente por la web
                     </p>
                   </div>
+
 
                   <div>
                     <p className="text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">
