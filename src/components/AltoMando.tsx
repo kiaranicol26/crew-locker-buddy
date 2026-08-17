@@ -27,6 +27,8 @@ type Instructor = {
   can_delete: boolean;
   can_emit_rnap: boolean;
   can_edit_files: boolean;
+  can_edit_pd: boolean;
+
   created_at: string;
   created_by: string | null;
 };
@@ -154,7 +156,7 @@ export function AltoMando({ session }: { session: Session }) {
     loadAll();
   }
 
-  async function togglePerm(i: Instructor, field: "can_delete" | "can_emit_rnap" | "can_edit_files", value: boolean) {
+  async function togglePerm(i: Instructor, field: "can_delete" | "can_emit_rnap" | "can_edit_files" | "can_edit_pd", value: boolean) {
     if (i.is_alto_mando) { toast.info("Los Comisarios tienen todos los permisos"); return; }
     setInstructors(prev => prev.map(x => x.id === i.id ? { ...x, [field]: value } : x));
     const { error } = await db.from("instructors").update({ [field]: value } as any).eq("id", i.id);
@@ -339,6 +341,8 @@ export function AltoMando({ session }: { session: Session }) {
                   <th className="p-3 text-center border border-blue-500 uppercase font-bold">Borrar agentes</th>
                   <th className="p-3 text-center border border-blue-500 uppercase font-bold">Emitir RNAP</th>
                   <th className="p-3 text-center border border-blue-500 uppercase font-bold">Editar Archivos</th>
+                  <th className="p-3 text-center border border-blue-500 uppercase font-bold">Registro PD</th>
+
                   <th className="p-3 text-left border border-blue-500 uppercase font-bold">Creado por</th>
                   <th className="p-3 border border-blue-500 w-10" />
                 </tr>
@@ -378,6 +382,14 @@ export function AltoMando({ session }: { session: Session }) {
                         onCheckedChange={v => togglePerm(i, "can_edit_files", v)}
                       />
                     </td>
+                    <td className="p-3 text-center border border-slate-200">
+                      <Switch
+                        checked={i.is_alto_mando || !!i.can_edit_pd}
+                        disabled={i.is_alto_mando}
+                        onCheckedChange={v => togglePerm(i, "can_edit_pd", v)}
+                      />
+                    </td>
+
                     <td className="p-3 text-slate-500 border border-slate-200">{i.created_by ?? "—"}</td>
                     <td className="p-3 text-center border border-slate-200">
                       <Button size="icon" variant="ghost"

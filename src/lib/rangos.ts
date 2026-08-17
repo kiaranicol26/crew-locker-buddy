@@ -7,9 +7,42 @@ export const RANGOS = [
   "Cabo",
   "Oficial",
   "Cadete",
+  "Aspirante",
+] as const;
+
+/** Plural headings used as separators in the Registro de Policías. */
+export const RANGO_PLURAL: Record<string, string> = {
+  Comisario: "Comisarios",
+  Inspector: "Inspectores",
+  Capitan: "Capitanes",
+  Teniente: "Tenientes",
+  Sargento: "Sargentos",
+  Cabo: "Cabos",
+  Oficial: "Oficiales",
+  Cadete: "Cadetes",
+  Aspirante: "Aspirantes",
+};
+
+export const DIVISIONES = [
+  "Ninguna",
+  "SWAT",
+  "Motorizada",
+  "Detectives",
+  "Instrucción",
+  "Asuntos Internos",
+  "Tránsito",
+] as const;
+
+export const DIVISION_RANGOS = [
+  "Jefe",
+  "Subjefe",
+  "Supervisor",
+  "Miembro",
+  "Aprendiz",
 ] as const;
 
 export type Rango = (typeof RANGOS)[number];
+
 
 const norm = (s: string) =>
   s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();

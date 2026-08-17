@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SalarioRouteImport } from './routes/salario'
 import { Route as RnapRouteImport } from './routes/rnap'
+import { Route as RegistroPoliciasRouteImport } from './routes/registro-policias'
 import { Route as PoliciasRouteImport } from './routes/policias'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as LoginRouteImport } from './routes/login'
@@ -28,6 +29,11 @@ const SalarioRoute = SalarioRouteImport.update({
 const RnapRoute = RnapRouteImport.update({
   id: '/rnap',
   path: '/rnap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistroPoliciasRoute = RegistroPoliciasRouteImport.update({
+  id: '/registro-policias',
+  path: '/registro-policias',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PoliciasRoute = PoliciasRouteImport.update({
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/policias': typeof PoliciasRoute
+  '/registro-policias': typeof RegistroPoliciasRoute
   '/rnap': typeof RnapRoute
   '/salario': typeof SalarioRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/policias': typeof PoliciasRoute
+  '/registro-policias': typeof RegistroPoliciasRoute
   '/rnap': typeof RnapRoute
   '/salario': typeof SalarioRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/policias': typeof PoliciasRoute
+  '/registro-policias': typeof RegistroPoliciasRoute
   '/rnap': typeof RnapRoute
   '/salario': typeof SalarioRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/perfil'
     | '/policias'
+    | '/registro-policias'
     | '/rnap'
     | '/salario'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/perfil'
     | '/policias'
+    | '/registro-policias'
     | '/rnap'
     | '/salario'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/perfil'
     | '/policias'
+    | '/registro-policias'
     | '/rnap'
     | '/salario'
   fileRoutesById: FileRoutesById
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PerfilRoute: typeof PerfilRoute
   PoliciasRoute: typeof PoliciasRoute
+  RegistroPoliciasRoute: typeof RegistroPoliciasRoute
   RnapRoute: typeof RnapRoute
   SalarioRoute: typeof SalarioRoute
 }
@@ -174,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/rnap'
       fullPath: '/rnap'
       preLoaderRoute: typeof RnapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registro-policias': {
+      id: '/registro-policias'
+      path: '/registro-policias'
+      fullPath: '/registro-policias'
+      preLoaderRoute: typeof RegistroPoliciasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/policias': {
@@ -244,6 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PerfilRoute: PerfilRoute,
   PoliciasRoute: PoliciasRoute,
+  RegistroPoliciasRoute: RegistroPoliciasRoute,
   RnapRoute: RnapRoute,
   SalarioRoute: SalarioRoute,
 }
