@@ -156,7 +156,7 @@ export function AltoMando({ session }: { session: Session }) {
     loadAll();
   }
 
-  async function togglePerm(i: Instructor, field: "can_delete" | "can_emit_rnap" | "can_edit_files", value: boolean) {
+  async function togglePerm(i: Instructor, field: "can_delete" | "can_emit_rnap" | "can_edit_files" | "can_edit_pd", value: boolean) {
     if (i.is_alto_mando) { toast.info("Los Comisarios tienen todos los permisos"); return; }
     setInstructors(prev => prev.map(x => x.id === i.id ? { ...x, [field]: value } : x));
     const { error } = await db.from("instructors").update({ [field]: value } as any).eq("id", i.id);
