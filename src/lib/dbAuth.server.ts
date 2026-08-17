@@ -7,6 +7,8 @@ export type Claims = {
   del: boolean;
   rnap: boolean;
   files?: boolean;
+  pd?: boolean;
+
   exp: number;
 };
 
