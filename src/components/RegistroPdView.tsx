@@ -1,0 +1,315 @@
+import { useEffect, useMemo, useState } from "react";
+import sapdLogo from "@/assets/sapd-logo.png.asset.json";
+import { db } from "@/lib/db";
+import { Session, logAction } from "@/lib/session";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { RANGOS, RANGO_PLURAL, DIVISIONES, DIVISION_RANGOS, sortByRango } from "@/lib/rangos";
+import { fileToCompressedDataUrl } from "@/lib/appearance";
+import { toast } from "sonner";
+import { Trash2, Plus, Pencil, BadgeCheck, UserRound, Upload } from "lucide-react";
+
+type PdMember = {
+  id: string;
+  nombre: string;
+  rango: string | null;
+  foto: string | null;
+  placa: string | null;
+  division: string | null;
+  division_rango: string | null;
+  sueldo_defecto: number;
+  es_instructor: boolean;
+  created_at: string;
+};
+
+type Draft = {
+  id?: string;
+  nombre: string;
+  rango: string;
+  foto: string;
+  placa: string;
+  division: string;
+  division_rango: string;
+};
+
+const emptyDraft: Draft = {
+  nombre: "", rango: "Oficial", foto: "", placa: "",
+  division: "Ninguna", division_rango: "Miembro",
+};
+
+export function RegistroPdView({ session }: { session: Session }) {
+  const [members, setMembers] = useState<PdMember[]>([]);
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const [saving, setSaving] = useState(false);
+
+  const canEdit = !!session.is_alto_mando || !!session.can_edit_pd;
+
+  async function load() {
+    const { data } = await db.from("pd_members").select("*").order("nombre", { ascending: true });
+    if (data) setMembers(data as unknown as PdMember[]);
+  }
+
+  useEffect(() => { load(); }, []);
+
+  function openNew() {
+    setDraft(emptyDraft);
+    setOpen(true);
+  }
+
+  function openEdit(m: PdMember) {
+    setDraft({
+      id: m.id,
+      nombre: m.nombre,
+      rango: m.rango ?? "Oficial",
+      foto: m.foto ?? "",
+      placa: m.placa ?? "",
+      division: m.division ?? "Ninguna",
+      division_rango: m.division_rango ?? "Miembro",
+    });
+    setOpen(true);
+  }
+
+  async function pickFile(file: File) {
+    try {
+      const url = await fileToCompressedDataUrl(file);
+      setDraft(d => ({ ...d, foto: url }));
+    } catch {
+      toast.error("No se pudo procesar la imagen");
+    }
+  }
+
+  async function save() {
+    const nombre = draft.nombre.trim();
+    if (!nombre) return toast.error("Escribe el Nombre_Apellido");
+    setSaving(true);
+    const values = {
+      nombre,
+      rango: draft.rango || null,
+      foto: draft.foto.trim() || null,
+      placa: draft.placa.trim() || null,
+      division: draft.division || null,
+      division_rango: draft.division === "Ninguna" ? null : draft.division_rango || null,
+    };
+    const res = draft.id
+      ? await db.from("pd_members").update(values as any).eq("id", draft.id)
+      : await db.from("pd_members").insert({ ...values, created_by: session.id } as any);
+    setSaving(false);
+    if (res.error) return toast.error(res.error.message);
+    await logAction(db, session, draft.id ? "UPDATE_PD_MEMBER" : "CREATE_PD_MEMBER", { nombre, rango: draft.rango });
+    toast.success(draft.id ? "Registro actualizado" : `${nombre} registrado`);
+    setOpen(false);
+    load();
+  }
+
+  async function remove(m: PdMember) {
+    if (!confirm(`¿Eliminar a ${m.nombre} del Registro de Policías?`)) return;
+    const { error } = await db.from("pd_members").delete().eq("id", m.id);
+    if (error) return toast.error(error.message);
+    await logAction(db, session, "DELETE_PD_MEMBER", { nombre: m.nombre });
+    load();
+  }
+
+  const groups = useMemo(() => {
+    const filtered = members.filter(m =>
+      (m.nombre + " " + (m.rango ?? "") + " " + (m.placa ?? "") + " " + (m.division ?? ""))
+        .toLowerCase()
+        .includes(q.toLowerCase()),
+    );
+    const known = RANGOS.map(r => ({
+      rango: r as string,
+      label: RANGO_PLURAL[r] ?? r,
+      items: sortByRango(filtered.filter(m => (m.rango ?? "") === r), m => m.rango, m => m.nombre),
+    }));
+    const sinRango = filtered.filter(m => !RANGOS.includes((m.rango ?? "") as any));
+    if (sinRango.length) known.push({ rango: "—", label: "Sin rango asignado", items: sinRango });
+    return known.filter(g => g.items.length > 0);
+  }, [members, q]);
+
+  return (
+    <div className="space-y-4">
+      <Card className="overflow-hidden border-2 border-blue-300 bg-white shadow-md rounded-none">
+        <div className="h-1.5 bg-blue-700" />
+        <div className="p-5 space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 flex items-center justify-center bg-white border-2 border-blue-300 p-1">
+              <img src={sapdLogo.url} alt="SAPD" className="w-full h-full object-contain" />
+            </div>
+            <div>
+              <p className="text-blue-700 text-xs uppercase tracking-[0.3em] font-extrabold">
+                San Andreas Police Department
+              </p>
+              <h2 className="text-2xl font-black uppercase tracking-wide text-slate-900 font-display">
+                Registro de Policías
+              </h2>
+            </div>
+            <div className="ml-auto flex items-center gap-3">
+              <div className="flex items-center gap-2 px-3 py-2 bg-blue-700 text-white">
+                <BadgeCheck className="w-4 h-4" />
+                <span className="font-mono font-bold">{members.length}</span>
+                <span className="text-[10px] uppercase tracking-widest font-bold">Carnets</span>
+              </div>
+              {canEdit && (
+                <Button onClick={openNew}
+                  className="h-11 rounded-none bg-blue-700 hover:bg-blue-800 text-white font-bold tracking-wider">
+                  <Plus className="w-4 h-4 mr-1" /> Nuevo policía
+                </Button>
+              )}
+            </div>
+          </div>
+
+          <Input placeholder="Buscar por nombre, rango, placa o división…" value={q}
+            onChange={e => setQ(e.target.value)}
+            className="h-10 rounded-none border-blue-300 bg-white font-semibold text-slate-800 max-w-md" />
+          {!canEdit && (
+            <p className="text-xs text-slate-500 font-semibold">
+              Solo el Alto Mando (o con permiso “Registro PD”) puede crear, editar o borrar registros.
+            </p>
+          )}
+        </div>
+      </Card>
+
+      {groups.map(g => (
+        <div key={g.rango} className="space-y-3">
+          <div className="flex items-center gap-3 bg-blue-700 text-white px-4 py-2">
+            <h3 className="font-display font-black uppercase tracking-[0.25em] text-sm">[{g.label}]</h3>
+            <span className="ml-auto font-mono font-bold text-xs">{g.items.length}</span>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {g.items.map(m => (
+              <Card key={m.id} className="overflow-hidden border-2 border-blue-300 bg-white rounded-none shadow-sm">
+                <div className="h-1 bg-blue-700" />
+                <div className="p-3 flex gap-3">
+                  <div className="w-20 h-20 shrink-0 border-2 border-blue-300 bg-blue-50 flex items-center justify-center overflow-hidden">
+                    {m.foto ? (
+                      <img src={m.foto} alt={m.nombre} className="w-full h-full object-cover" />
+                    ) : (
+                      <UserRound className="w-8 h-8 text-blue-300" />
+                    )}
+                  </div>
+                  <div className="min-w-0 space-y-1">
+                    <p className="font-mono font-black text-slate-900 truncate">{m.nombre}</p>
+                    <p className="text-[11px] uppercase tracking-widest font-extrabold text-blue-700">
+                      {m.rango ?? "Sin rango"}
+                    </p>
+                    <p className="text-[11px] font-bold text-slate-600">
+                      Placa: <span className="font-mono">{m.placa || "—"}</span>
+                    </p>
+                    <p className="text-[11px] font-bold text-slate-600 truncate">
+                      {m.division && m.division !== "Ninguna"
+                        ? `${m.division} · ${m.division_rango ?? "—"}`
+                        : "Sin división"}
+                    </p>
+                  </div>
+                </div>
+                {canEdit && (
+                  <div className="flex border-t border-blue-200">
+                    <Button variant="ghost" onClick={() => openEdit(m)}
+                      className="flex-1 rounded-none h-9 text-blue-700 hover:bg-blue-50 font-bold text-xs uppercase">
+                      <Pencil className="w-3.5 h-3.5 mr-1" /> Editar
+                    </Button>
+                    <Button variant="ghost" onClick={() => remove(m)}
+                      className="rounded-none h-9 w-10 hover:bg-red-100">
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </Button>
+                  </div>
+                )}
+              </Card>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {groups.length === 0 && (
+        <Card className="border-2 border-blue-300 bg-white rounded-none p-10 text-center text-slate-400 uppercase tracking-widest font-bold">
+          Sin policías registrados.
+        </Card>
+      )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="rounded-none border-2 border-blue-300 bg-white">
+          <DialogHeader>
+            <DialogTitle className="font-display font-black uppercase tracking-wide text-slate-900">
+              {draft.id ? "Editar policía" : "Nuevo policía"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-20 h-20 border-2 border-blue-300 bg-blue-50 flex items-center justify-center overflow-hidden">
+                {draft.foto ? (
+                  <img src={draft.foto} alt="Foto" className="w-full h-full object-cover" />
+                ) : (
+                  <UserRound className="w-8 h-8 text-blue-300" />
+                )}
+              </div>
+              <div className="flex-1 space-y-2">
+                <Input placeholder="Enlace de la foto 4x4" value={draft.foto}
+                  onChange={e => setDraft(d => ({ ...d, foto: e.target.value }))}
+                  className="h-10 rounded-none border-blue-300 bg-white font-semibold text-slate-800" />
+                <label className="inline-flex items-center gap-2 px-3 py-2 border border-blue-300 text-xs font-bold uppercase text-blue-700 cursor-pointer hover:bg-blue-50">
+                  <Upload className="w-3.5 h-3.5" /> Subir imagen
+                  <input type="file" accept="image/*" className="hidden"
+                    onChange={e => { const f = e.target.files?.[0]; if (f) pickFile(f); }} />
+                </label>
+              </div>
+            </div>
+
+            <Input placeholder="Nombre_Apellido" value={draft.nombre}
+              onChange={e => setDraft(d => ({ ...d, nombre: e.target.value }))}
+              className="h-10 rounded-none border-blue-300 bg-white font-semibold text-slate-800" />
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Select value={draft.rango} onValueChange={v => setDraft(d => ({ ...d, rango: v }))}>
+                <SelectTrigger className="h-10 rounded-none border-blue-300 bg-white font-semibold text-slate-800">
+                  <SelectValue placeholder="Rango" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-blue-200 rounded-none">
+                  {RANGOS.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Input placeholder="Número de placa" value={draft.placa}
+                onChange={e => setDraft(d => ({ ...d, placa: e.target.value }))}
+                className="h-10 rounded-none border-blue-300 bg-white font-mono font-bold text-slate-800" />
+              <Select value={draft.division} onValueChange={v => setDraft(d => ({ ...d, division: v }))}>
+                <SelectTrigger className="h-10 rounded-none border-blue-300 bg-white font-semibold text-slate-800">
+                  <SelectValue placeholder="División" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-blue-200 rounded-none">
+                  {DIVISIONES.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={draft.division_rango}
+                onValueChange={v => setDraft(d => ({ ...d, division_rango: v }))}>
+                <SelectTrigger disabled={draft.division === "Ninguna"}
+                  className="h-10 rounded-none border-blue-300 bg-white font-semibold text-slate-800 disabled:opacity-60">
+                  <SelectValue placeholder="Rango de división" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-blue-200 rounded-none">
+                  {DIVISION_RANGOS.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}
+              className="rounded-none border-blue-300 font-bold">Cancelar</Button>
+            <Button onClick={save} disabled={saving}
+              className="rounded-none bg-blue-700 hover:bg-blue-800 text-white font-bold">
+              {saving ? "Guardando…" : "Guardar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
