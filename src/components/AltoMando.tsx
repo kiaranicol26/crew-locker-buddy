@@ -27,6 +27,8 @@ type Instructor = {
   can_delete: boolean;
   can_emit_rnap: boolean;
   can_edit_files: boolean;
+  can_edit_pd: boolean;
+
   created_at: string;
   created_by: string | null;
 };
