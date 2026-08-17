@@ -26,19 +26,18 @@ export const RANGO_PLURAL: Record<string, string> = {
 export const DIVISIONES = [
   "Ninguna",
   "SWAT",
-  "Motorizada",
-  "Detectives",
-  "Instrucción",
-  "Asuntos Internos",
-  "Tránsito",
+  "Relaciones Publicas",
+  "Instructores",
+  "N/A",
+  "N/A",
+  "N/A",
 ] as const;
 
 export const DIVISION_RANGOS = [
-  "Jefe",
-  "Subjefe",
+  "Lider",
+  "Sub Lider",
   "Supervisor",
   "Miembro",
-  "Aprendiz",
 ] as const;
 
 export type Rango = (typeof RANGOS)[number];
