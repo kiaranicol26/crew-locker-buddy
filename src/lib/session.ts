@@ -8,6 +8,8 @@ export type Session = {
   can_delete: boolean;
   can_emit_rnap: boolean;
   can_edit_files?: boolean;
+  can_edit_pd?: boolean;
+
   avatar_url?: string | null;
   descripcion?: string | null;
 };
