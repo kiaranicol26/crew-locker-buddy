@@ -98,9 +98,13 @@ export function authorize(spec: QuerySpec, claims: Claims | null): QuerySpec {
   switch (spec.table) {
     case "salary_months":
     case "salary_entries":
-    case "pd_members":
       if (write && !alto) deny("Solo Alto Mando puede editar");
       return spec;
+
+    case "pd_members":
+      if (write && !alto && !claims?.pd) deny("Sin permiso para editar el registro de policías");
+      return spec;
+
 
     case "app_settings":
       if (write) {
