@@ -168,6 +168,7 @@ export type Database = {
           avatar_url: string | null
           can_delete: boolean
           can_edit_files: boolean
+          can_edit_pd: boolean
           can_emit_rnap: boolean
           created_at: string
           created_by: string | null
@@ -181,6 +182,7 @@ export type Database = {
           avatar_url?: string | null
           can_delete?: boolean
           can_edit_files?: boolean
+          can_edit_pd?: boolean
           can_emit_rnap?: boolean
           created_at?: string
           created_by?: string | null
@@ -194,6 +196,7 @@ export type Database = {
           avatar_url?: string | null
           can_delete?: boolean
           can_edit_files?: boolean
+          can_edit_pd?: boolean
           can_emit_rnap?: boolean
           created_at?: string
           created_by?: string | null
@@ -236,9 +239,13 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          division: string | null
+          division_rango: string | null
           es_instructor: boolean
+          foto: string | null
           id: string
           nombre: string
+          placa: string | null
           rango: string | null
           sueldo_defecto: number
           updated_at: string
@@ -246,9 +253,13 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
+          division?: string | null
+          division_rango?: string | null
           es_instructor?: boolean
+          foto?: string | null
           id?: string
           nombre: string
+          placa?: string | null
           rango?: string | null
           sueldo_defecto?: number
           updated_at?: string
@@ -256,9 +267,13 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
+          division?: string | null
+          division_rango?: string | null
           es_instructor?: boolean
+          foto?: string | null
           id?: string
           nombre?: string
+          placa?: string | null
           rango?: string | null
           sueldo_defecto?: number
           updated_at?: string
