@@ -341,6 +341,8 @@ export function AltoMando({ session }: { session: Session }) {
                   <th className="p-3 text-center border border-blue-500 uppercase font-bold">Borrar agentes</th>
                   <th className="p-3 text-center border border-blue-500 uppercase font-bold">Emitir RNAP</th>
                   <th className="p-3 text-center border border-blue-500 uppercase font-bold">Editar Archivos</th>
+                  <th className="p-3 text-center border border-blue-500 uppercase font-bold">Registro PD</th>
+
                   <th className="p-3 text-left border border-blue-500 uppercase font-bold">Creado por</th>
                   <th className="p-3 border border-blue-500 w-10" />
                 </tr>
