@@ -380,6 +380,14 @@ export function AltoMando({ session }: { session: Session }) {
                         onCheckedChange={v => togglePerm(i, "can_edit_files", v)}
                       />
                     </td>
+                    <td className="p-3 text-center border border-slate-200">
+                      <Switch
+                        checked={i.is_alto_mando || !!i.can_edit_pd}
+                        disabled={i.is_alto_mando}
+                        onCheckedChange={v => togglePerm(i, "can_edit_pd", v)}
+                      />
+                    </td>
+
                     <td className="p-3 text-slate-500 border border-slate-200">{i.created_by ?? "—"}</td>
                     <td className="p-3 text-center border border-slate-200">
                       <Button size="icon" variant="ghost"
