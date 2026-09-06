@@ -6,6 +6,7 @@ import { logAction, setSession, type Session } from "@/lib/session";
 import { getBackground } from "@/lib/appearance";
 import { LogOut, Shield, LogIn, UserRound } from "lucide-react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const TABS = [
   { to: "/exsapd", label: "EX POLICÍAS", public: false, alto: false },
@@ -85,6 +86,7 @@ export function AppShell({
             </div>
 
             <div className="absolute top-3 right-4 lg:right-6 flex items-center gap-2">
+              <ThemeToggle />
               <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-blue-600 text-white border border-blue-700">
                 {session?.avatar_url ? (
                   <img src={session.avatar_url} alt={session.name}
