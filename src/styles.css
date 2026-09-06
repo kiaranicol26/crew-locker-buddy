@@ -165,3 +165,145 @@
     font-weight: 800;
   }
 }
+
+/* ==========================================================================
+   Temas de la web: claro, oscuro, glass claro, glass oscuro
+   Se activan con [data-theme] en <html>.
+   ========================================================================== */
+
+/* --- Glass claro --------------------------------------------------------- */
+[data-theme="glass-light"] .bg-white,
+[data-theme="glass-light"] .bg-white\/95,
+[data-theme="glass-light"] .bg-slate-50,
+[data-theme="glass-light"] .bg-blue-50,
+[data-theme="glass-light"] .bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(18px) saturate(150%);
+}
+
+[data-theme="glass-light"] .shadow-md,
+[data-theme="glass-light"] .shadow-sm {
+  box-shadow: 0 8px 30px rgba(30, 58, 138, 0.18);
+}
+
+[data-theme="glass-light"] table.font-table tbody tr,
+[data-theme="glass-light"] table.font-table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+[data-theme="glass-light"] .bg-blue-700,
+[data-theme="glass-light"] .bg-blue-600 {
+  background-color: rgba(29, 78, 216, 0.78) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* --- Base compartida por los dos modos oscuros --------------------------- */
+[data-theme="dark"],
+[data-theme="glass-dark"] {
+  --sapd-surface: oklch(0.24 0.02 258);
+  --sapd-surface-2: oklch(0.28 0.025 258);
+  --sapd-line: oklch(0.42 0.04 258);
+  --sapd-txt: oklch(0.95 0.01 258);
+  --sapd-txt-dim: oklch(0.78 0.02 258);
+  --sapd-blur: none;
+  --sapd-alpha: 1;
+}
+
+[data-theme="glass-dark"] {
+  --sapd-blur: blur(18px) saturate(140%);
+  --sapd-alpha: 0.55;
+}
+
+[data-theme="dark"] body,
+[data-theme="glass-dark"] body {
+  background-color: oklch(0.18 0.02 258);
+  color: var(--sapd-txt);
+}
+
+[data-theme="dark"] .bg-slate-200,
+[data-theme="glass-dark"] .bg-slate-200 {
+  background-color: oklch(0.18 0.02 258) !important;
+}
+
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-white\/95,
+[data-theme="dark"] .bg-slate-50,
+[data-theme="dark"] .bg-slate-100,
+[data-theme="dark"] .bg-blue-50,
+[data-theme="glass-dark"] .bg-white,
+[data-theme="glass-dark"] .bg-white\/95,
+[data-theme="glass-dark"] .bg-slate-50,
+[data-theme="glass-dark"] .bg-slate-100,
+[data-theme="glass-dark"] .bg-blue-50 {
+  background-color: color-mix(in oklab, var(--sapd-surface) calc(var(--sapd-alpha) * 100%), transparent) !important;
+  backdrop-filter: var(--sapd-blur);
+}
+
+[data-theme="dark"] .bg-blue-100,
+[data-theme="glass-dark"] .bg-blue-100 {
+  background-color: var(--sapd-surface-2) !important;
+}
+
+[data-theme="dark"] table.font-table tbody tr,
+[data-theme="glass-dark"] table.font-table tbody tr {
+  background-color: color-mix(in oklab, var(--sapd-surface) calc(var(--sapd-alpha) * 100%), transparent);
+}
+
+[data-theme="dark"] table.font-table tbody tr:nth-child(even),
+[data-theme="glass-dark"] table.font-table tbody tr:nth-child(even) {
+  background-color: color-mix(in oklab, var(--sapd-surface-2) calc(var(--sapd-alpha) * 100%), transparent);
+}
+
+[data-theme="dark"] .text-slate-900,
+[data-theme="dark"] .text-slate-800,
+[data-theme="dark"] .text-slate-700,
+[data-theme="glass-dark"] .text-slate-900,
+[data-theme="glass-dark"] .text-slate-800,
+[data-theme="glass-dark"] .text-slate-700 {
+  color: var(--sapd-txt) !important;
+}
+
+[data-theme="dark"] .text-slate-600,
+[data-theme="dark"] .text-slate-500,
+[data-theme="dark"] .text-slate-400,
+[data-theme="glass-dark"] .text-slate-600,
+[data-theme="glass-dark"] .text-slate-500,
+[data-theme="glass-dark"] .text-slate-400 {
+  color: var(--sapd-txt-dim) !important;
+}
+
+[data-theme="dark"] .text-blue-700,
+[data-theme="dark"] .text-blue-600,
+[data-theme="dark"] .text-blue-800,
+[data-theme="glass-dark"] .text-blue-700,
+[data-theme="glass-dark"] .text-blue-600,
+[data-theme="glass-dark"] .text-blue-800 {
+  color: oklch(0.78 0.13 250) !important;
+}
+
+[data-theme="dark"] .border-blue-300,
+[data-theme="dark"] .border-blue-200,
+[data-theme="dark"] .border-slate-200,
+[data-theme="dark"] .border-slate-300,
+[data-theme="glass-dark"] .border-blue-300,
+[data-theme="glass-dark"] .border-blue-200,
+[data-theme="glass-dark"] .border-slate-200,
+[data-theme="glass-dark"] .border-slate-300 {
+  border-color: var(--sapd-line) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="glass-dark"] input,
+[data-theme="glass-dark"] textarea {
+  background-color: oklch(0.30 0.02 258) !important;
+  color: var(--sapd-txt) !important;
+}
+
+[data-theme="dark"] .bg-blue-700,
+[data-theme="dark"] .bg-blue-600,
+[data-theme="glass-dark"] .bg-blue-700,
+[data-theme="glass-dark"] .bg-blue-600 {
+  background-color: color-mix(in oklab, oklch(0.45 0.15 258) calc(var(--sapd-alpha) * 100%), transparent) !important;
+  backdrop-filter: var(--sapd-blur);
+}
