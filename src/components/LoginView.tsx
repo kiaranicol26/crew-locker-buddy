@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function LoginView() {
   const [id, setId] = useState("");
@@ -56,6 +57,7 @@ export function LoginView() {
       style={bg ? { backgroundImage: `url(${bg})` } : undefined}
     >
       {bg && <div className="absolute inset-0 bg-slate-900/40" />}
+      <div className="absolute top-4 right-4 z-10"><ThemeToggle /></div>
       <div className="relative flex min-h-screen items-center justify-center p-6">
         <div className="w-full max-w-2xl">
           <div className="bg-white border border-blue-200 border-b-0 px-3 py-2 flex items-center gap-2">
