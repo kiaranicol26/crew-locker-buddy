@@ -163,6 +163,48 @@ export type Database = {
         }
         Relationships: []
       }
+      forum_posts: {
+        Row: {
+          adjuntos: Json
+          contenido: string
+          created_at: string
+          created_by: string | null
+          created_by_id: string | null
+          edited_at: string | null
+          edited_by: string | null
+          id: string
+          nota: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          adjuntos?: Json
+          contenido?: string
+          created_at?: string
+          created_by?: string | null
+          created_by_id?: string | null
+          edited_at?: string | null
+          edited_by?: string | null
+          id?: string
+          nota?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          adjuntos?: Json
+          contenido?: string
+          created_at?: string
+          created_by?: string | null
+          created_by_id?: string | null
+          edited_at?: string | null
+          edited_by?: string | null
+          id?: string
+          nota?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       instructors: {
         Row: {
           avatar_url: string | null
