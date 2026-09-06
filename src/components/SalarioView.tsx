@@ -32,6 +32,7 @@ type PdMember = {
   nombre: string;
   rango: string | null;
   sueldo_defecto: number;
+  es_instructor: boolean;
 };
 
 export function SalarioView({ session }: { session: Session | null }) {
@@ -46,7 +47,7 @@ export function SalarioView({ session }: { session: Session | null }) {
     const [m, e, p] = await Promise.all([
       db.from("salary_months").select("*").order("created_at", { ascending: false }),
       db.from("salary_entries").select("*").order("created_at", { ascending: true }),
-      db.from("pd_members").select("id, nombre, rango, sueldo_defecto").order("nombre", { ascending: true }),
+      db.from("pd_members").select("id, nombre, rango, sueldo_defecto, es_instructor").order("nombre", { ascending: true }),
     ]);
     if (m.data) {
       setMonths(m.data as Month[]);
@@ -129,9 +130,14 @@ export function SalarioView({ session }: { session: Session | null }) {
   }
 
   const fmt = (n: number) => `${Math.round(n).toLocaleString("es-ES")} Coins`;
-  const rangoDe = (nombre: string | null) =>
-    pd.find(p => p.nombre === nombre)?.rango ?? null;
-  const totalDe = (r: Entry) => Number(r.paga) || 0;
+  const pdDe = (nombre: string | null) => pd.find(p => p.nombre === nombre) ?? null;
+  const rangoDe = (nombre: string | null) => pdDe(nombre)?.rango ?? null;
+  const baseDe = (r: Entry) => {
+    const m = pdDe(r.nombre);
+    return m ? Number(m.sueldo_defecto) || 0 : Number(r.paga) || 0;
+  };
+  const esInstructor = (r: Entry) => !!pdDe(r.nombre)?.es_instructor;
+  const totalDe = (r: Entry) => baseDe(r) + (esInstructor(r) ? 15 : 0);
 
   return (
     <div className="space-y-4">
@@ -168,7 +174,7 @@ export function SalarioView({ session }: { session: Session | null }) {
           )}
           <p className="text-xs text-slate-500 font-semibold">
             {canEdit
-              ? "Los nombres se toman de la Lista PD y no se editan aquí."
+              ? "Los nombres y la paga se toman de la Lista PD (sueldo por defecto +15 si es Instructor) y no se editan aquí."
               : "Vista pública de solo lectura. Solo el Alto Mando puede editar los salarios."}
           </p>
         </div>
@@ -246,17 +252,12 @@ export function SalarioView({ session }: { session: Session | null }) {
                             {rangoDe(r.nombre) ?? "—"}
                           </td>
                           <td className="p-3 border border-blue-200 font-semibold text-slate-600 whitespace-nowrap">{m.label}</td>
-                          <td className="p-2 border border-blue-200">
-                            {canEdit ? (
-                              <Input
-                                type="number"
-                                value={String(r.paga ?? 0)}
-                                onChange={e => patchLocal(r.id, { paga: Number(e.target.value) })}
-                                onBlur={e => saveEntry(r.id, { paga: Number(e.target.value) || 0 })}
-                                className="h-9 w-28 rounded-none border-blue-200 bg-white text-slate-800 font-mono font-bold"
-                              />
-                            ) : (
-                              <span className="font-mono font-bold text-slate-800">{fmt(totalDe(r))}</span>
+                          <td className="p-3 border border-blue-200 whitespace-nowrap">
+                            <span className="font-mono font-bold text-slate-800">{fmt(totalDe(r))}</span>
+                            {esInstructor(r) && (
+                              <span className="ml-2 text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">
+                                +15 (Instructor)
+                              </span>
                             )}
                           </td>
                           <td className="p-2 border border-blue-200">

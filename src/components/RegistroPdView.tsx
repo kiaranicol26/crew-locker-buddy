@@ -50,6 +50,7 @@ export function RegistroPdView({ session }: { session: Session }) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [saving, setSaving] = useState(false);
+  const [avatars, setAvatars] = useState<Record<string, string>>({});
 
   const canEdit = !!session.is_alto_mando || !!session.can_edit_pd;
 
@@ -58,7 +59,20 @@ export function RegistroPdView({ session }: { session: Session }) {
     if (data) setMembers(data as unknown as PdMember[]);
   }
 
-  useEffect(() => { load(); }, []);
+  async function loadAvatars() {
+    const { data } = await db.from("instructors").select("name, avatar_url");
+    if (!data) return;
+    const map: Record<string, string> = {};
+    (data as any[]).forEach(u => {
+      if (u?.name && u?.avatar_url) map[String(u.name).trim().toLowerCase()] = u.avatar_url;
+    });
+    setAvatars(map);
+  }
+
+  const fotoDe = (m: PdMember) =>
+    avatars[m.nombre.trim().toLowerCase()] ?? m.foto ?? null;
+
+  useEffect(() => { load(); loadAvatars(); }, []);
 
   function openNew() {
     setDraft(emptyDraft);
@@ -189,8 +203,8 @@ export function RegistroPdView({ session }: { session: Session }) {
                 <div className="h-1 bg-blue-700" />
                 <div className="p-3 flex gap-3">
                   <div className="w-20 h-20 shrink-0 border-2 border-blue-300 bg-blue-50 flex items-center justify-center overflow-hidden">
-                    {m.foto ? (
-                      <img src={m.foto} alt={m.nombre} className="w-full h-full object-cover" />
+                    {fotoDe(m) ? (
+                      <img src={fotoDe(m)!} alt={m.nombre} className="w-full h-full object-cover" />
                     ) : (
                       <UserRound className="w-8 h-8 text-blue-300" />
                     )}
