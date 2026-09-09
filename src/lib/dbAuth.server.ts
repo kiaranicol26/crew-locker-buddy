@@ -8,6 +8,7 @@ export type Claims = {
   rnap: boolean;
   files?: boolean;
   pd?: boolean;
+  role?: string | null;
 
   exp: number;
 };
@@ -28,8 +29,7 @@ export type QuerySpec = {
 
 const TABLES = new Set([
   "app_settings",
-  "archivo_personas",
-  "archivo_notas",
+  "forum_posts",
   "aspirantes",
   "instructors",
   "logs",
@@ -145,11 +145,13 @@ export function authorize(spec: QuerySpec, claims: Claims | null): QuerySpec {
       return spec;
     }
 
-    case "archivo_personas":
-    case "archivo_notas":
+    case "forum_posts": {
       if (!claims) deny();
-      if (write && !alto && !claims.files) deny("Sin permiso para editar archivos");
-      return spec;
+      if (spec.op === "select" || spec.op === "insert") return spec;
+      // Alto Mando y Cúpula editan cualquier fichero; el autor edita el suyo.
+      if (alto || claims.role === "Cupula") return spec;
+      return { ...spec, filters: [...(spec.filters ?? []), { type: "eq", column: "created_by_id", value: claims.id }] };
+    }
 
     case "aspirantes":
     case "records":

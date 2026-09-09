@@ -9,6 +9,8 @@ export type Session = {
   can_emit_rnap: boolean;
   can_edit_files?: boolean;
   can_edit_pd?: boolean;
+  role?: string | null;
+
 
   avatar_url?: string | null;
   descripcion?: string | null;
