@@ -15,6 +15,7 @@ import { Route as RegistroPoliciasRouteImport } from './routes/registro-policias
 import { Route as PoliciasRouteImport } from './routes/policias'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForumRouteImport } from './routes/forum'
 import { Route as ExsapdRouteImport } from './routes/exsapd'
 import { Route as AspirantesRouteImport } from './routes/aspirantes'
 import { Route as ArchivoRouteImport } from './routes/archivo'
@@ -50,6 +51,11 @@ const PerfilRoute = PerfilRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForumRoute = ForumRouteImport.update({
+  id: '/forum',
+  path: '/forum',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExsapdRoute = ExsapdRouteImport.update({
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/archivo': typeof ArchivoRoute
   '/aspirantes': typeof AspirantesRoute
   '/exsapd': typeof ExsapdRoute
+  '/forum': typeof ForumRoute
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/policias': typeof PoliciasRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/archivo': typeof ArchivoRoute
   '/aspirantes': typeof AspirantesRoute
   '/exsapd': typeof ExsapdRoute
+  '/forum': typeof ForumRoute
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/policias': typeof PoliciasRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/archivo': typeof ArchivoRoute
   '/aspirantes': typeof AspirantesRoute
   '/exsapd': typeof ExsapdRoute
+  '/forum': typeof ForumRoute
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/policias': typeof PoliciasRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/archivo'
     | '/aspirantes'
     | '/exsapd'
+    | '/forum'
     | '/login'
     | '/perfil'
     | '/policias'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/archivo'
     | '/aspirantes'
     | '/exsapd'
+    | '/forum'
     | '/login'
     | '/perfil'
     | '/policias'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/archivo'
     | '/aspirantes'
     | '/exsapd'
+    | '/forum'
     | '/login'
     | '/perfil'
     | '/policias'
@@ -177,6 +189,7 @@ export interface RootRouteChildren {
   ArchivoRoute: typeof ArchivoRoute
   AspirantesRoute: typeof AspirantesRoute
   ExsapdRoute: typeof ExsapdRoute
+  ForumRoute: typeof ForumRoute
   LoginRoute: typeof LoginRoute
   PerfilRoute: typeof PerfilRoute
   PoliciasRoute: typeof PoliciasRoute
@@ -230,6 +243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forum': {
+      id: '/forum'
+      path: '/forum'
+      fullPath: '/forum'
+      preLoaderRoute: typeof ForumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/exsapd': {
       id: '/exsapd'
       path: '/exsapd'
@@ -281,6 +301,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArchivoRoute: ArchivoRoute,
   AspirantesRoute: AspirantesRoute,
   ExsapdRoute: ExsapdRoute,
+  ForumRoute: ForumRoute,
   LoginRoute: LoginRoute,
   PerfilRoute: PerfilRoute,
   PoliciasRoute: PoliciasRoute,
