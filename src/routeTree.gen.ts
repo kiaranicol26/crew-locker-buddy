@@ -20,6 +20,7 @@ import { Route as AspirantesRouteImport } from './routes/aspirantes'
 import { Route as ArchivoRouteImport } from './routes/archivo'
 import { Route as AltoMandoRouteImport } from './routes/alto-mando'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicForumSplatRouteImport } from './routes/api/public/forum/$'
 
 const SalarioRoute = SalarioRouteImport.update({
   id: '/salario',
@@ -76,6 +77,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicForumSplatRoute = ApiPublicForumSplatRouteImport.update({
+  id: '/api/public/forum/$',
+  path: '/api/public/forum/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/registro-policias': typeof RegistroPoliciasRoute
   '/rnap': typeof RnapRoute
   '/salario': typeof SalarioRoute
+  '/api/public/forum/$': typeof ApiPublicForumSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/registro-policias': typeof RegistroPoliciasRoute
   '/rnap': typeof RnapRoute
   '/salario': typeof SalarioRoute
+  '/api/public/forum/$': typeof ApiPublicForumSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/registro-policias': typeof RegistroPoliciasRoute
   '/rnap': typeof RnapRoute
   '/salario': typeof SalarioRoute
+  '/api/public/forum/$': typeof ApiPublicForumSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/registro-policias'
     | '/rnap'
     | '/salario'
+    | '/api/public/forum/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/registro-policias'
     | '/rnap'
     | '/salario'
+    | '/api/public/forum/$'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/registro-policias'
     | '/rnap'
     | '/salario'
+    | '/api/public/forum/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   RegistroPoliciasRoute: typeof RegistroPoliciasRoute
   RnapRoute: typeof RnapRoute
   SalarioRoute: typeof SalarioRoute
+  ApiPublicForumSplatRoute: typeof ApiPublicForumSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/forum/$': {
+      id: '/api/public/forum/$'
+      path: '/api/public/forum/$'
+      fullPath: '/api/public/forum/$'
+      preLoaderRoute: typeof ApiPublicForumSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -267,6 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegistroPoliciasRoute: RegistroPoliciasRoute,
   RnapRoute: RnapRoute,
   SalarioRoute: SalarioRoute,
+  ApiPublicForumSplatRoute: ApiPublicForumSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
