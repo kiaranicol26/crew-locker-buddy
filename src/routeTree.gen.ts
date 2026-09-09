@@ -18,7 +18,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForumRouteImport } from './routes/forum'
 import { Route as ExsapdRouteImport } from './routes/exsapd'
 import { Route as AspirantesRouteImport } from './routes/aspirantes'
-import { Route as ArchivoRouteImport } from './routes/archivo'
 import { Route as AltoMandoRouteImport } from './routes/alto-mando'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicForumSplatRouteImport } from './routes/api/public/forum/$'
@@ -68,11 +67,6 @@ const AspirantesRoute = AspirantesRouteImport.update({
   path: '/aspirantes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ArchivoRoute = ArchivoRouteImport.update({
-  id: '/archivo',
-  path: '/archivo',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AltoMandoRoute = AltoMandoRouteImport.update({
   id: '/alto-mando',
   path: '/alto-mando',
@@ -92,7 +86,6 @@ const ApiPublicForumSplatRoute = ApiPublicForumSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alto-mando': typeof AltoMandoRoute
-  '/archivo': typeof ArchivoRoute
   '/aspirantes': typeof AspirantesRoute
   '/exsapd': typeof ExsapdRoute
   '/forum': typeof ForumRoute
@@ -107,7 +100,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alto-mando': typeof AltoMandoRoute
-  '/archivo': typeof ArchivoRoute
   '/aspirantes': typeof AspirantesRoute
   '/exsapd': typeof ExsapdRoute
   '/forum': typeof ForumRoute
@@ -123,7 +115,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/alto-mando': typeof AltoMandoRoute
-  '/archivo': typeof ArchivoRoute
   '/aspirantes': typeof AspirantesRoute
   '/exsapd': typeof ExsapdRoute
   '/forum': typeof ForumRoute
@@ -140,7 +131,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/alto-mando'
-    | '/archivo'
     | '/aspirantes'
     | '/exsapd'
     | '/forum'
@@ -155,7 +145,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/alto-mando'
-    | '/archivo'
     | '/aspirantes'
     | '/exsapd'
     | '/forum'
@@ -170,7 +159,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/alto-mando'
-    | '/archivo'
     | '/aspirantes'
     | '/exsapd'
     | '/forum'
@@ -186,7 +174,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AltoMandoRoute: typeof AltoMandoRoute
-  ArchivoRoute: typeof ArchivoRoute
   AspirantesRoute: typeof AspirantesRoute
   ExsapdRoute: typeof ExsapdRoute
   ForumRoute: typeof ForumRoute
@@ -264,13 +251,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AspirantesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/archivo': {
-      id: '/archivo'
-      path: '/archivo'
-      fullPath: '/archivo'
-      preLoaderRoute: typeof ArchivoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/alto-mando': {
       id: '/alto-mando'
       path: '/alto-mando'
@@ -298,7 +278,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AltoMandoRoute: AltoMandoRoute,
-  ArchivoRoute: ArchivoRoute,
   AspirantesRoute: AspirantesRoute,
   ExsapdRoute: ExsapdRoute,
   ForumRoute: ForumRoute,
