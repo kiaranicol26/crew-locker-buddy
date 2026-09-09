@@ -45,7 +45,7 @@ export const loginWithId = createServerFn({ method: "POST" })
 
     const { data: row } = await supabaseAdmin
       .from("instructors")
-      .select("id, name, is_alto_mando, can_delete, can_emit_rnap, can_edit_files, can_edit_pd, avatar_url, descripcion")
+      .select("id, name, is_alto_mando, can_delete, can_emit_rnap, can_edit_files, can_edit_pd, role, avatar_url, descripcion")
       .eq("id", data.id)
       .maybeSingle();
 
@@ -61,6 +61,7 @@ export const loginWithId = createServerFn({ method: "POST" })
       can_edit_files: !!r.is_alto_mando || !!r.can_edit_files,
       can_edit_pd: !!r.is_alto_mando || !!r.can_edit_pd,
       avatar_url: (r.avatar_url ?? null) as string | null,
+      role: (r.role ?? null) as string | null,
       descripcion: (r.descripcion ?? null) as string | null,
     };
 
@@ -72,6 +73,7 @@ export const loginWithId = createServerFn({ method: "POST" })
       rnap: session.can_emit_rnap,
       files: session.can_edit_files,
       pd: session.can_edit_pd,
+      role: session.role,
     });
 
 
