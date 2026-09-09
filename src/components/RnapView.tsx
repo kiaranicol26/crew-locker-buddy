@@ -11,7 +11,6 @@ import { Plus, Download, Trash2, Pencil, Upload, X, Send, FileText } from "lucid
 import { toPng, toBlob } from "html-to-image";
 import { sendRnapToDiscord } from "@/lib/discord";
 import rnapTplUrl from "@/assets/rnap-nuevo.png";
-import { ensureArchivoPersona } from "@/lib/archivo";
 
 type Cert = {
   id: string;
