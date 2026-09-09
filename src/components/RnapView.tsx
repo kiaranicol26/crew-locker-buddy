@@ -80,7 +80,7 @@ export function RnapView({ session }: { session: Session }) {
     } else {
       const { error } = await db.from("rnap_certificates").insert(payload);
       if (error) return toast.error(error.message);
-      await ensureArchivoPersona(d.nombre_completo, d.foto ?? null);
+      
       await logAction(db, session, "CREATE_RNAP", { name: d.nombre_completo });
       toast.success("RNAP guardado");
     }
