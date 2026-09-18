@@ -42,6 +42,67 @@ export function SalarioView({ session }: { session: Session | null }) {
   const [pd, setPd] = useState<PdMember[]>([]);
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [newMonth, setNewMonth] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const slug = (s: string) =>
+    s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "mes";
+
+  async function capture(monthId: string) {
+    const node = cardRefs.current[monthId];
+    if (!node) throw new Error("No se encontró la tabla");
+    const { toPng } = await import("html-to-image");
+    return await toPng(node, {
+      pixelRatio: 3,
+      cacheBust: true,
+      backgroundColor: "#ffffff",
+      width: node.scrollWidth,
+      height: node.scrollHeight,
+      style: { overflow: "visible" },
+    });
+  }
+
+  async function exportImage(m: Month) {
+    setBusy(m.id + "-img");
+    try {
+      const dataUrl = await capture(m.id);
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `salario-${slug(m.label)}.png`;
+      a.click();
+      toast.success("Imagen descargada");
+    } catch (e: any) {
+      toast.error(e?.message || "No se pudo generar la imagen");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function exportPdf(m: Month) {
+    setBusy(m.id + "-pdf");
+    try {
+      const dataUrl = await capture(m.id);
+      const { jsPDF } = await import("jspdf");
+      const img = new Image();
+      img.src = dataUrl;
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+      const landscape = img.width > img.height;
+      const pdf = new jsPDF({ orientation: landscape ? "landscape" : "portrait", unit: "pt", format: "a4", compress: true });
+      const pw = pdf.internal.pageSize.getWidth();
+      const ph = pdf.internal.pageSize.getHeight();
+      const margin = 24;
+      const scale = Math.min((pw - margin * 2) / img.width, (ph - margin * 2) / img.height);
+      const w = img.width * scale;
+      const h = img.height * scale;
+      pdf.addImage(dataUrl, "PNG", (pw - w) / 2, (ph - h) / 2, w, h, undefined, "FAST");
+      pdf.save(`salario-${slug(m.label)}.pdf`);
+      toast.success("PDF descargado");
+    } catch (e: any) {
+      toast.error(e?.message || "No se pudo generar el PDF");
+    } finally {
+      setBusy(null);
+    }
+  }
 
   async function loadAll() {
     const [m, e, p] = await Promise.all([
