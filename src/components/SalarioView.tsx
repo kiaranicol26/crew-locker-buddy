@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 import { db } from "@/lib/db";
 import { Session, logAction } from "@/lib/session";
@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 
 import { sortByRango } from "@/lib/rangos";
 import { toast } from "sonner";
-import { Trash2, Plus, ChevronDown, ChevronRight, Coins, Users } from "lucide-react";
+import { Trash2, Plus, ChevronDown, ChevronRight, Coins, Users, FileDown, ImageDown } from "lucide-react";
 
 type Month = {
   id: string;
