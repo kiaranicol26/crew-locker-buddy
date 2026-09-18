@@ -272,23 +272,42 @@ export function SalarioView({ session }: { session: Session | null }) {
                 </span>
                 <span className="text-xs text-slate-500 font-mono font-bold">{rows.length} agentes</span>
               </button>
-              {canEdit && (
-                <div className="flex items-center gap-2">
-                  <Button size="sm" variant="outline"
-                    onClick={() => syncMonth(m.id, rows.map(r => r.nombre ?? ""))}
-                    className="h-9 rounded-none border-blue-300 bg-white text-blue-800 font-bold hover:bg-blue-50">
-                    <Users className="w-4 h-4 mr-1" /> Cargar Lista PD
-                  </Button>
-                  <Button size="icon" variant="ghost" onClick={() => removeMonth(m)}
-                    className="h-9 w-9 rounded-none hover:bg-red-100">
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </Button>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <Button size="sm" variant="outline" disabled={busy === m.id + "-pdf"}
+                  onClick={async () => { setOpen(p => ({ ...p, [m.id]: true })); await new Promise(r => setTimeout(r, 60)); exportPdf(m); }}
+                  className="h-9 rounded-none border-blue-300 bg-white text-blue-800 font-bold hover:bg-blue-50">
+                  <FileDown className="w-4 h-4 mr-1" /> {busy === m.id + "-pdf" ? "Generando…" : "PDF"}
+                </Button>
+                <Button size="sm" variant="outline" disabled={busy === m.id + "-img"}
+                  onClick={async () => { setOpen(p => ({ ...p, [m.id]: true })); await new Promise(r => setTimeout(r, 60)); exportImage(m); }}
+                  className="h-9 rounded-none border-blue-300 bg-white text-blue-800 font-bold hover:bg-blue-50">
+                  <ImageDown className="w-4 h-4 mr-1" /> {busy === m.id + "-img" ? "Generando…" : "Imagen"}
+                </Button>
+                {canEdit && (
+                  <>
+                    <Button size="sm" variant="outline"
+                      onClick={() => syncMonth(m.id, rows.map(r => r.nombre ?? ""))}
+                      className="h-9 rounded-none border-blue-300 bg-white text-blue-800 font-bold hover:bg-blue-50">
+                      <Users className="w-4 h-4 mr-1" /> Cargar Lista PD
+                    </Button>
+                    <Button size="icon" variant="ghost" onClick={() => removeMonth(m)}
+                      className="h-9 w-9 rounded-none hover:bg-red-100">
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
 
             {isOpen && (
-              <div className="p-5 grid gap-4 lg:grid-cols-[1fr_auto] items-start">
+              <div ref={el => { cardRefs.current[m.id] = el; }} className="bg-white p-5 grid gap-4 lg:grid-cols-[1fr_auto] items-start">
+                <div className="lg:col-span-2 flex items-center gap-3">
+                  <img src={sapdLogo.url} alt="SAPD" className="w-9 h-9 object-contain" />
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.25em] font-extrabold text-blue-700">San Andreas Police Department</p>
+                    <p className="text-lg font-black uppercase tracking-wide text-slate-900 font-display">Salario · {m.label}</p>
+                  </div>
+                </div>
                 <div className="border-2 border-blue-300 overflow-x-auto">
                   <table className="w-full text-sm font-table">
                     <thead>
