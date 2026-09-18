@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 import { db } from "@/lib/db";
 import { Session, logAction } from "@/lib/session";
@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 
 import { sortByRango } from "@/lib/rangos";
 import { toast } from "sonner";
-import { Trash2, Plus, ChevronDown, ChevronRight, Coins, Users } from "lucide-react";
+import { Trash2, Plus, ChevronDown, ChevronRight, Coins, Users, FileDown, ImageDown } from "lucide-react";
 
 type Month = {
   id: string;
@@ -42,6 +42,67 @@ export function SalarioView({ session }: { session: Session | null }) {
   const [pd, setPd] = useState<PdMember[]>([]);
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [newMonth, setNewMonth] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const slug = (s: string) =>
+    s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "mes";
+
+  async function capture(monthId: string) {
+    const node = cardRefs.current[monthId];
+    if (!node) throw new Error("No se encontró la tabla");
+    const { toPng } = await import("html-to-image");
+    return await toPng(node, {
+      pixelRatio: 3,
+      cacheBust: true,
+      backgroundColor: "#ffffff",
+      width: node.scrollWidth,
+      height: node.scrollHeight,
+      style: { overflow: "visible" },
+    });
+  }
+
+  async function exportImage(m: Month) {
+    setBusy(m.id + "-img");
+    try {
+      const dataUrl = await capture(m.id);
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `salario-${slug(m.label)}.png`;
+      a.click();
+      toast.success("Imagen descargada");
+    } catch (e: any) {
+      toast.error(e?.message || "No se pudo generar la imagen");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function exportPdf(m: Month) {
+    setBusy(m.id + "-pdf");
+    try {
+      const dataUrl = await capture(m.id);
+      const { jsPDF } = await import("jspdf");
+      const img = new Image();
+      img.src = dataUrl;
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+      const landscape = img.width > img.height;
+      const pdf = new jsPDF({ orientation: landscape ? "landscape" : "portrait", unit: "pt", format: "a4", compress: true });
+      const pw = pdf.internal.pageSize.getWidth();
+      const ph = pdf.internal.pageSize.getHeight();
+      const margin = 24;
+      const scale = Math.min((pw - margin * 2) / img.width, (ph - margin * 2) / img.height);
+      const w = img.width * scale;
+      const h = img.height * scale;
+      pdf.addImage(dataUrl, "PNG", (pw - w) / 2, (ph - h) / 2, w, h, undefined, "FAST");
+      pdf.save(`salario-${slug(m.label)}.pdf`);
+      toast.success("PDF descargado");
+    } catch (e: any) {
+      toast.error(e?.message || "No se pudo generar el PDF");
+    } finally {
+      setBusy(null);
+    }
+  }
 
   async function loadAll() {
     const [m, e, p] = await Promise.all([
@@ -211,23 +272,42 @@ export function SalarioView({ session }: { session: Session | null }) {
                 </span>
                 <span className="text-xs text-slate-500 font-mono font-bold">{rows.length} agentes</span>
               </button>
-              {canEdit && (
-                <div className="flex items-center gap-2">
-                  <Button size="sm" variant="outline"
-                    onClick={() => syncMonth(m.id, rows.map(r => r.nombre ?? ""))}
-                    className="h-9 rounded-none border-blue-300 bg-white text-blue-800 font-bold hover:bg-blue-50">
-                    <Users className="w-4 h-4 mr-1" /> Cargar Lista PD
-                  </Button>
-                  <Button size="icon" variant="ghost" onClick={() => removeMonth(m)}
-                    className="h-9 w-9 rounded-none hover:bg-red-100">
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </Button>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <Button size="sm" variant="outline" disabled={busy === m.id + "-pdf"}
+                  onClick={async () => { setOpen(p => ({ ...p, [m.id]: true })); await new Promise(r => setTimeout(r, 60)); exportPdf(m); }}
+                  className="h-9 rounded-none border-blue-300 bg-white text-blue-800 font-bold hover:bg-blue-50">
+                  <FileDown className="w-4 h-4 mr-1" /> {busy === m.id + "-pdf" ? "Generando…" : "PDF"}
+                </Button>
+                <Button size="sm" variant="outline" disabled={busy === m.id + "-img"}
+                  onClick={async () => { setOpen(p => ({ ...p, [m.id]: true })); await new Promise(r => setTimeout(r, 60)); exportImage(m); }}
+                  className="h-9 rounded-none border-blue-300 bg-white text-blue-800 font-bold hover:bg-blue-50">
+                  <ImageDown className="w-4 h-4 mr-1" /> {busy === m.id + "-img" ? "Generando…" : "Imagen"}
+                </Button>
+                {canEdit && (
+                  <>
+                    <Button size="sm" variant="outline"
+                      onClick={() => syncMonth(m.id, rows.map(r => r.nombre ?? ""))}
+                      className="h-9 rounded-none border-blue-300 bg-white text-blue-800 font-bold hover:bg-blue-50">
+                      <Users className="w-4 h-4 mr-1" /> Cargar Lista PD
+                    </Button>
+                    <Button size="icon" variant="ghost" onClick={() => removeMonth(m)}
+                      className="h-9 w-9 rounded-none hover:bg-red-100">
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
 
             {isOpen && (
-              <div className="p-5 grid gap-4 lg:grid-cols-[1fr_auto] items-start">
+              <div ref={el => { cardRefs.current[m.id] = el; }} className="bg-white p-5 grid gap-4 lg:grid-cols-[1fr_auto] items-start">
+                <div className="lg:col-span-2 flex items-center gap-3">
+                  <img src={sapdLogo.url} alt="SAPD" className="w-9 h-9 object-contain" />
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.25em] font-extrabold text-blue-700">San Andreas Police Department</p>
+                    <p className="text-lg font-black uppercase tracking-wide text-slate-900 font-display">Salario · {m.label}</p>
+                  </div>
+                </div>
                 <div className="border-2 border-blue-300 overflow-x-auto">
                   <table className="w-full text-sm font-table">
                     <thead>
