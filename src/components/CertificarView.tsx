@@ -220,7 +220,7 @@ function CertCard({ data, downloadable = false }: { data: Form; downloadable?: b
         </Centered>
 
         {/* Clase / categoría / objeto */}
-        <Centered top="58.2%" size="2.1cqw" weight={700}>
+        <Centered top="60.4%" size="2.1cqw" weight={700}>
           {tipo.clase}
         </Centered>
 
