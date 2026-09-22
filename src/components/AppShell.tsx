@@ -12,6 +12,7 @@ const TABS = [
   { to: "/exsapd", label: "EX POLICÍAS", public: false, alto: false },
   { to: "/aspirantes", label: "ASPIRANTES", public: false, alto: false },
   { to: "/rnap", label: "R.N.A.P", public: false, alto: false },
+  { to: "/certificar", label: "CERTIFICAR", public: false, alto: false },
   { to: "/registro-policias", label: "REGISTRO PD", public: false, alto: false },
   { to: "/policias", label: "LISTA PD", public: false, alto: false },
 
