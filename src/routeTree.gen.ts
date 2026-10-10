@@ -9,68 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AltoMandoRouteImport } from './routes/alto-mando'
-import { Route as AspirantesRouteImport } from './routes/aspirantes'
-import { Route as CertificarRouteImport } from './routes/certificar'
-import { Route as ExsapdRouteImport } from './routes/exsapd'
-import { Route as ForumRouteImport } from './routes/forum'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as PerfilRouteImport } from './routes/perfil'
-import { Route as PoliciasRouteImport } from './routes/policias'
-import { Route as RegistroPoliciasRouteImport } from './routes/registro-policias'
-import { Route as RnapRouteImport } from './routes/rnap'
 import { Route as SalarioRouteImport } from './routes/salario'
+import { Route as RnapRouteImport } from './routes/rnap'
+import { Route as RegistroPoliciasRouteImport } from './routes/registro-policias'
+import { Route as PoliciasRouteImport } from './routes/policias'
+import { Route as PerfilRouteImport } from './routes/perfil'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForumRouteImport } from './routes/forum'
+import { Route as ExsapdRouteImport } from './routes/exsapd'
+import { Route as CertificarRouteImport } from './routes/certificar'
+import { Route as AspirantesRouteImport } from './routes/aspirantes'
+import { Route as AltoMandoRouteImport } from './routes/alto-mando'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicForumSplatRouteImport } from './routes/api/public/forum/$'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AltoMandoRoute = AltoMandoRouteImport.update({
-  id: '/alto-mando',
-  path: '/alto-mando',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AspirantesRoute = AspirantesRouteImport.update({
-  id: '/aspirantes',
-  path: '/aspirantes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CertificarRoute = CertificarRouteImport.update({
-  id: '/certificar',
-  path: '/certificar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExsapdRoute = ExsapdRouteImport.update({
-  id: '/exsapd',
-  path: '/exsapd',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForumRoute = ForumRouteImport.update({
-  id: '/forum',
-  path: '/forum',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PerfilRoute = PerfilRouteImport.update({
-  id: '/perfil',
-  path: '/perfil',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PoliciasRoute = PoliciasRouteImport.update({
-  id: '/policias',
-  path: '/policias',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegistroPoliciasRoute = RegistroPoliciasRouteImport.update({
-  id: '/registro-policias',
-  path: '/registro-policias',
+const SalarioRoute = SalarioRouteImport.update({
+  id: '/salario',
+  path: '/salario',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RnapRoute = RnapRouteImport.update({
@@ -78,9 +33,54 @@ const RnapRoute = RnapRouteImport.update({
   path: '/rnap',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SalarioRoute = SalarioRouteImport.update({
-  id: '/salario',
-  path: '/salario',
+const RegistroPoliciasRoute = RegistroPoliciasRouteImport.update({
+  id: '/registro-policias',
+  path: '/registro-policias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoliciasRoute = PoliciasRouteImport.update({
+  id: '/policias',
+  path: '/policias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForumRoute = ForumRouteImport.update({
+  id: '/forum',
+  path: '/forum',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExsapdRoute = ExsapdRouteImport.update({
+  id: '/exsapd',
+  path: '/exsapd',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificarRoute = CertificarRouteImport.update({
+  id: '/certificar',
+  path: '/certificar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AspirantesRoute = AspirantesRouteImport.update({
+  id: '/aspirantes',
+  path: '/aspirantes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AltoMandoRoute = AltoMandoRouteImport.update({
+  id: '/alto-mando',
+  path: '/alto-mando',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicForumSplatRoute = ApiPublicForumSplatRouteImport.update({
@@ -201,74 +201,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/alto-mando': {
-      id: '/alto-mando'
-      path: '/alto-mando'
-      fullPath: '/alto-mando'
-      preLoaderRoute: typeof AltoMandoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/aspirantes': {
-      id: '/aspirantes'
-      path: '/aspirantes'
-      fullPath: '/aspirantes'
-      preLoaderRoute: typeof AspirantesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/certificar': {
-      id: '/certificar'
-      path: '/certificar'
-      fullPath: '/certificar'
-      preLoaderRoute: typeof CertificarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/exsapd': {
-      id: '/exsapd'
-      path: '/exsapd'
-      fullPath: '/exsapd'
-      preLoaderRoute: typeof ExsapdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forum': {
-      id: '/forum'
-      path: '/forum'
-      fullPath: '/forum'
-      preLoaderRoute: typeof ForumRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/perfil': {
-      id: '/perfil'
-      path: '/perfil'
-      fullPath: '/perfil'
-      preLoaderRoute: typeof PerfilRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/policias': {
-      id: '/policias'
-      path: '/policias'
-      fullPath: '/policias'
-      preLoaderRoute: typeof PoliciasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/registro-policias': {
-      id: '/registro-policias'
-      path: '/registro-policias'
-      fullPath: '/registro-policias'
-      preLoaderRoute: typeof RegistroPoliciasRouteImport
+    '/salario': {
+      id: '/salario'
+      path: '/salario'
+      fullPath: '/salario'
+      preLoaderRoute: typeof SalarioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rnap': {
@@ -278,11 +215,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RnapRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/salario': {
-      id: '/salario'
-      path: '/salario'
-      fullPath: '/salario'
-      preLoaderRoute: typeof SalarioRouteImport
+    '/registro-policias': {
+      id: '/registro-policias'
+      path: '/registro-policias'
+      fullPath: '/registro-policias'
+      preLoaderRoute: typeof RegistroPoliciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/policias': {
+      id: '/policias'
+      path: '/policias'
+      fullPath: '/policias'
+      preLoaderRoute: typeof PoliciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forum': {
+      id: '/forum'
+      path: '/forum'
+      fullPath: '/forum'
+      preLoaderRoute: typeof ForumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exsapd': {
+      id: '/exsapd'
+      path: '/exsapd'
+      fullPath: '/exsapd'
+      preLoaderRoute: typeof ExsapdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificar': {
+      id: '/certificar'
+      path: '/certificar'
+      fullPath: '/certificar'
+      preLoaderRoute: typeof CertificarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aspirantes': {
+      id: '/aspirantes'
+      path: '/aspirantes'
+      fullPath: '/aspirantes'
+      preLoaderRoute: typeof AspirantesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alto-mando': {
+      id: '/alto-mando'
+      path: '/alto-mando'
+      fullPath: '/alto-mando'
+      preLoaderRoute: typeof AltoMandoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/forum/$': {
