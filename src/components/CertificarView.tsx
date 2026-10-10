@@ -1,6 +1,12 @@
 import { useRef, useState } from "react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
 import tpl from "@/assets/certificado-capacitacion.png.asset.json";
+import pictoM4 from "@/assets/picto-m4.png.asset.json";
+import pictoEdc from "@/assets/picto-edc.png.asset.json";
+import pictoSniper from "@/assets/picto-sniper.png.asset.json";
+import pictoAk from "@/assets/picto-ak.png.asset.json";
+import pictoMary from "@/assets/picto-mary.png.asset.json";
+import pictoAir from "@/assets/picto-air.png.asset.json";
 import { db } from "@/lib/db";
 import { Session, logAction } from "@/lib/session";
 import { Button } from "@/components/ui/button";
@@ -183,7 +189,15 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 const NAVY = "#12294f";
-const BLACK = "#111111";
+
+const PICTOS: Record<string, string> = {
+  M4: pictoM4.url,
+  EDC: pictoEdc.url,
+  SNIPER: pictoSniper.url,
+  "AK-47": pictoAk.url,
+  MARY: pictoMary.url,
+  AIR: pictoAir.url,
+};
 
 function M4Icon() {
   return (
