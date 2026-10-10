@@ -242,18 +242,22 @@ export function CertCard({ data, downloadable = false }: { data: Form; downloada
 
         {/* Pictograma del objeto dentro del recuadro */}
         <div
-          className="absolute"
+          className="absolute flex items-center justify-center"
           style={{
             top: "64.2%",
             left: "50%",
             width: "17.5%",
+            aspectRatio: "1",
+            padding: "3%",
             transform: "translateX(-50%)",
           }}
         >
-          {(() => {
-            const Icon = ICONS[tipo.categoria] ?? M4Icon;
-            return <Icon />;
-          })()}
+          <img
+            src={PICTOS[tipo.categoria] ?? pictoM4.url}
+            alt={tipo.categoria}
+            className="max-w-full max-h-full object-contain"
+            draggable={false}
+          />
         </div>
 
         {/* Tapa el "CATEGORIA" impreso de la plantilla */}
