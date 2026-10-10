@@ -298,9 +298,9 @@ export function CertCard({ data, downloadable = false }: { data: Form; downloada
         <div
           className="absolute"
           style={{
-            top: "63.6%",
+            top: "63.4%",
             left: "50%",
-            width: "15.5%",
+            width: "16.5%",
             transform: "translateX(-50%)",
           }}
         >
@@ -310,8 +310,21 @@ export function CertCard({ data, downloadable = false }: { data: Form; downloada
           })()}
         </div>
 
+        {/* Tapa el "CATEGORIA" impreso de la plantilla */}
+        <div
+          className="absolute"
+          style={{
+            top: "73.6%",
+            left: "50%",
+            width: "15%",
+            height: "2.8%",
+            transform: "translateX(-50%)",
+            background: "#fcf6ed",
+          }}
+        />
+
         {/* Categoría dentro del recuadro */}
-        <Centered top="70.6%" size="2.6cqw" weight={800} spacing="0.04em">
+        <Centered top="74.2%" size="2.3cqw" weight={800} spacing="0.04em">
           {tipo.categoria}
         </Centered>
 
