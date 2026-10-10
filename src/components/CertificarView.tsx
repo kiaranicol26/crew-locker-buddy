@@ -254,7 +254,7 @@ const ICONS: Record<string, () => React.ReactElement> = {
   AIR: HeliIcon,
 };
 
-function CertCard({ data, downloadable = false }: { data: Form; downloadable?: boolean }) {
+export function CertCard({ data, downloadable = false }: { data: Form; downloadable?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const tipo = TIPOS.find(t => t.value === data.tipo) ?? TIPOS[0];
 

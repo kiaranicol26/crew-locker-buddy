@@ -18,6 +18,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForumRouteImport } from './routes/forum'
 import { Route as ExsapdRouteImport } from './routes/exsapd'
 import { Route as CertificarRouteImport } from './routes/certificar'
+import { Route as CertTestRouteImport } from './routes/cert-test'
 import { Route as AspirantesRouteImport } from './routes/aspirantes'
 import { Route as AltoMandoRouteImport } from './routes/alto-mando'
 import { Route as IndexRouteImport } from './routes/index'
@@ -68,6 +69,11 @@ const CertificarRoute = CertificarRouteImport.update({
   path: '/certificar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CertTestRoute = CertTestRouteImport.update({
+  id: '/cert-test',
+  path: '/cert-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AspirantesRoute = AspirantesRouteImport.update({
   id: '/aspirantes',
   path: '/aspirantes',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alto-mando': typeof AltoMandoRoute
   '/aspirantes': typeof AspirantesRoute
+  '/cert-test': typeof CertTestRoute
   '/certificar': typeof CertificarRoute
   '/exsapd': typeof ExsapdRoute
   '/forum': typeof ForumRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alto-mando': typeof AltoMandoRoute
   '/aspirantes': typeof AspirantesRoute
+  '/cert-test': typeof CertTestRoute
   '/certificar': typeof CertificarRoute
   '/exsapd': typeof ExsapdRoute
   '/forum': typeof ForumRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/alto-mando': typeof AltoMandoRoute
   '/aspirantes': typeof AspirantesRoute
+  '/cert-test': typeof CertTestRoute
   '/certificar': typeof CertificarRoute
   '/exsapd': typeof ExsapdRoute
   '/forum': typeof ForumRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/'
     | '/alto-mando'
     | '/aspirantes'
+    | '/cert-test'
     | '/certificar'
     | '/exsapd'
     | '/forum'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/alto-mando'
     | '/aspirantes'
+    | '/cert-test'
     | '/certificar'
     | '/exsapd'
     | '/forum'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/alto-mando'
     | '/aspirantes'
+    | '/cert-test'
     | '/certificar'
     | '/exsapd'
     | '/forum'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AltoMandoRoute: typeof AltoMandoRoute
   AspirantesRoute: typeof AspirantesRoute
+  CertTestRoute: typeof CertTestRoute
   CertificarRoute: typeof CertificarRoute
   ExsapdRoute: typeof ExsapdRoute
   ForumRoute: typeof ForumRoute
@@ -264,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CertificarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cert-test': {
+      id: '/cert-test'
+      path: '/cert-test'
+      fullPath: '/cert-test'
+      preLoaderRoute: typeof CertTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/aspirantes': {
       id: '/aspirantes'
       path: '/aspirantes'
@@ -299,6 +319,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AltoMandoRoute: AltoMandoRoute,
   AspirantesRoute: AspirantesRoute,
+  CertTestRoute: CertTestRoute,
   CertificarRoute: CertificarRoute,
   ExsapdRoute: ExsapdRoute,
   ForumRoute: ForumRoute,
