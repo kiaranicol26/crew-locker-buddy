@@ -298,9 +298,9 @@ export function CertCard({ data, downloadable = false }: { data: Form; downloada
         <div
           className="absolute"
           style={{
-            top: "63.4%",
+            top: "64.2%",
             left: "50%",
-            width: "16.5%",
+            width: "17.5%",
             transform: "translateX(-50%)",
           }}
         >
