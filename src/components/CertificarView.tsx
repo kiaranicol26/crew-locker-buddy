@@ -294,8 +294,24 @@ function CertCard({ data, downloadable = false }: { data: Form; downloadable?: b
           {tipo.clase}
         </Centered>
 
+        {/* Pictograma del objeto dentro del recuadro */}
+        <div
+          className="absolute"
+          style={{
+            top: "63.6%",
+            left: "50%",
+            width: "15.5%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          {(() => {
+            const Icon = ICONS[tipo.categoria] ?? M4Icon;
+            return <Icon />;
+          })()}
+        </div>
+
         {/* Categoría dentro del recuadro */}
-        <Centered top="66.5%" size="3cqw" weight={800} spacing="0.04em">
+        <Centered top="70.6%" size="2.6cqw" weight={800} spacing="0.04em">
           {tipo.categoria}
         </Centered>
 
