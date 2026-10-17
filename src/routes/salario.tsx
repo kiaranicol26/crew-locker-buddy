@@ -7,6 +7,8 @@ export const Route = createFileRoute("/salario")({
   ssr: false,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Salario · mySAPD" },
       { name: "description", content: "Tablas mensuales de salarios del San Andreas Police Department." },
       { property: "og:title", content: "Salario · mySAPD" },

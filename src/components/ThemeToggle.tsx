@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { Sun, Moon, Sparkles, Stars } from "lucide-react";
-import { applyTheme, getTheme, nextTheme, setTheme, THEME_LABELS, type ThemeMode } from "@/lib/theme";
+import { Sun, Moon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { getTheme, nextTheme, setTheme, THEME_LABELS, type ThemeMode } from "@/lib/theme";
 
 const ICONS: Record<ThemeMode, typeof Sun> = {
   light: Sun,
   dark: Moon,
-  "glass-light": Sparkles,
-  "glass-dark": Stars,
 };
 
 export function ThemeToggle() {
@@ -15,7 +14,7 @@ export function ThemeToggle() {
   useEffect(() => {
     const current = getTheme();
     setMode(current);
-    applyTheme(current);
+    setTheme(current);
     const sync = () => setMode(getTheme());
     window.addEventListener("theme-change", sync);
     return () => window.removeEventListener("theme-change", sync);
@@ -24,14 +23,16 @@ export function ThemeToggle() {
   const Icon = ICONS[mode];
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
       onClick={() => setTheme(nextTheme(mode))}
-      title="Cambiar tema"
-      className="flex items-center gap-2 h-8 px-2.5 border border-blue-300 bg-white text-blue-800 text-[11px] font-extrabold uppercase tracking-wider hover:bg-blue-50 transition-colors"
+      title={`Cambiar a ${THEME_LABELS[nextTheme(mode)]}`}
+      aria-label={`Cambiar a ${THEME_LABELS[nextTheme(mode)]}`}
+      className="gap-2 h-8 min-w-8 rounded-none px-2.5 border-border bg-card text-foreground text-[11px] font-extrabold uppercase tracking-wider hover:bg-accent transition-colors"
     >
       <Icon className="w-4 h-4" />
       <span className="hidden md:inline">{THEME_LABELS[mode]}</span>
-    </button>
+    </Button>
   );
 }

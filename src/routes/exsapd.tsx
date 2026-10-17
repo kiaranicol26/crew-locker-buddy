@@ -5,6 +5,8 @@ import { RecordsTable } from "@/components/RecordsTable";
 export const Route = createFileRoute("/exsapd")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Ex Policías · mySAPD" },
       { name: "description", content: "Registro de ex policías del San Andreas Police Department." },
       { property: "og:title", content: "Ex Policías · mySAPD" },

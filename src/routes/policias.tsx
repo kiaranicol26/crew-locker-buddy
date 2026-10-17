@@ -5,6 +5,8 @@ import { ListaPdView } from "@/components/ListaPdView";
 export const Route = createFileRoute("/policias")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Lista PD · mySAPD" },
       { name: "description", content: "Lista de agentes activos del San Andreas Police Department." },
       { property: "og:title", content: "Lista PD · mySAPD" },

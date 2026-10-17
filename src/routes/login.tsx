@@ -7,6 +7,8 @@ export const Route = createFileRoute("/login")({
   ssr: false,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Acceso · mySAPD" },
       { name: "description", content: "Acceso al sistema interno del San Andreas Police Department." },
       { property: "og:title", content: "Acceso · mySAPD" },
