@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import sapdLogo from "@/assets/sapd-logo.png.asset.json";
-import tpl from "@/assets/certificado-capacitacion.png.asset.json";
+import tpl from "@/assets/certificado-new-capacitacion.png";
 import pictoM4 from "@/assets/picto-m4.png.asset.json";
 import pictoEdc from "@/assets/picto-edc.png.asset.json";
 import pictoSniper from "@/assets/picto-sniper.png.asset.json";
