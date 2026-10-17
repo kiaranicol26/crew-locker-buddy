@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { applyTheme, getTheme, nextTheme, setTheme, THEME_LABELS, type ThemeMode } from "@/lib/theme";
+import { getTheme, nextTheme, setTheme, THEME_LABELS, type ThemeMode } from "@/lib/theme";
 
 const ICONS: Record<ThemeMode, typeof Sun> = {
   light: Sun,
