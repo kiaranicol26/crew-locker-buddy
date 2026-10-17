@@ -23,12 +23,12 @@ import { Plus, Download } from "lucide-react";
 import { toPng } from "html-to-image";
 
 const TIPOS = [
-  { value: "Arma M4", clase: "ARMA DE FUEGO M4", categoria: "M4" },
-  { value: "Arma EDC", clase: "ARMA DE FUEGO EDC", categoria: "EDC" },
-  { value: "Arma SNIPER", clase: "ARMA DE FUEGO SNIPER", categoria: "SNIPER" },
-  { value: "Arma AK-47", clase: "ARMA DE FUEGO AK-47", categoria: "AK-47" },
-  { value: "Vehiculo Mary", clase: "VEHÍCULO POLICIAL MARY", categoria: "MARY" },
-  { value: "Vehiculo Air", clase: "VEHÍCULO AÉREO AIR", categoria: "AIR" },
+  { value: "Arma M4", clase: "Fusil de Asalto M4A1", categoria: "M4" },
+  { value: "Arma EDC", clase: "Escopeta de Asalto F-Spas12", categoria: "EDC" },
+  { value: "Arma SNIPER", clase: "Fusil de Francotirador R-700", categoria: "SNIPER" },
+  { value: "Arma AK-47", clase: "Fusil de Combate AK-47", categoria: "AK-47" },
+  { value: "Vehiculo Mary", clase: "Unidad Motorizada - Mary", categoria: "MARY" },
+  { value: "Vehiculo Air", clase: "Unidad Aerea - AIR", categoria: "AIR" },
 ] as const;
 
 type Form = {
