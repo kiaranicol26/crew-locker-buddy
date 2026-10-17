@@ -9,38 +9,79 @@ jobs:
 
     steps:
       - name: Send Discord Embed
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          EVENT: ${{ toJSON(github.event) }}
         run: |
-          HORA=$(TZ='America/Argentina/Buenos_Aires' date '+%H:%M')
+          HORA=$(TZ='America/Argentina/Buenos_Aires' date '+%d/%m/%Y %H:%M')
 
-          curl -H "Content-Type: application/json" \
-          -X POST \
-          -d "{
-            \"username\": \"Ministerio de Seguridad\",
-            \"embeds\": [{
-              \"title\": \"📢 Nueva actualización\",
-              \"description\": \"Se realizaron cambios en la **Web Gestión de SAPD**.\",
-              \"color\": 3447003,
-              \"fields\": [
-                {
-                  \"name\": \"👮 Autor\",
-                  \"value\": \"Kendo <@564161518027931650>\",
-                  \"inline\": true 
-                },
-                {
-                  \"name\": \"🕒 Hora de Edición\",
-                  \"value\": \"$HORA\",
-                  \"inline\": true
-                },
-                {
-                  \"name\": \"📝 Cambios realizados\",
-                  \"value\": \"${{ github.event.head_commit.message }}\",
-                  \"inline\": false
-                }
-              ],
-              \"footer\": {
-                \"text\": \"Web Gestión de SAPD\" 
+          COMMITS=$(echo "$EVENT" | jq -r '
+            [.commits[]? |
+              "• **\(.message | split("\n")[0])** — Kendo"
+            ] | join("\n")
+          ')
+
+          COUNT=$(echo "$EVENT" | jq '.commits | length')
+
+          if [ -z "$COMMITS" ]; then
+            COMMITS="Sin detalles de commits disponibles."
+          fi
+
+          PAYLOAD=$(jq -n \
+            --arg username "Ministerio de Seguridad" \
+            --arg title "📢 Nueva actualización" \
+            --arg repo "$REPO" \
+            --arg branch "$BRANCH" \
+            --arg hora "$HORA" \
+            --arg commits "$COMMITS" \
+            --arg count "$COUNT" \
+            '{
+              username: $username,
+              allowed_mentions: {
+                parse: []
               },
-              \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
-            }]
-          }" \
-          "${{ secrets.DISCORD_WEBHOOK }}"
+              embeds: [{
+                title: $title,
+                description: ("Se realizaron cambios en la **" + $repo + "**."),
+                color: 3447003,
+                fields: [
+                  {
+                    name: "📂 Repositorio",
+                    value: $repo,
+                    inline: false
+                  },
+                  {
+                    name: "🌿 Rama",
+                    value: $branch,
+                    inline: true
+                  },
+                  {
+                    name: "👮 Autor",
+                    value: "Kendo",
+                    inline: true
+                  },
+                  {
+                    name: "🕒 Fecha y hora",
+                    value: $hora,
+                    inline: true
+                  },
+                  {
+                    name: ("📝 Cambios realizados (" + $count + ")"),
+                    value: $commits,
+                    inline: false
+                  }
+                ],
+                footer: {
+                  text: "Web Gestión de SAPD • Sistema de notificaciones"
+                },
+                timestamp: (now | todate)
+              }]
+            }')
+
+          curl --fail-with-body \
+            -H "Content-Type: application/json" \
+            -X POST \
+            -d "$PAYLOAD" \
+            "$DISCORD_WEBHOOK"
